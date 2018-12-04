@@ -50,10 +50,10 @@ public class TeleOpMode extends OpMode
 
 
     // Set up driving so that robot can be controlled with 1 joystick (gp1, left)
-    double drive  = gamepad1.left_stick_y;
-    double turn   =  -gamepad1.left_stick_x;
-    double leftPower    = Range.clip(drive + turn, -1.0, 1.0) ;
-    double rightPower   = Range.clip(drive - turn, -1.0, 1.0) ;
+    double drive  = -gamepad1.left_stick_y;
+    double turn   =  gamepad1.left_stick_x;
+    double leftPower    = Range.clip(drive - turn, -1.0, 1.0) ;
+    double rightPower   = Range.clip(drive + turn, -1.0, 1.0) ;
 
         //Left Drive Power
     robot.leftDriveF.setPower(leftPower);    // TODO: Check if the back left motor isn't slower than the others
@@ -70,10 +70,13 @@ public class TeleOpMode extends OpMode
     robot.cageLiftR.setPower(rightLiftPow);
 
     // cage intake code below
-    if (gamepad1.a)
-        robot.cageIntake.setPosition(robot.cageIntake.getPosition()+0.1);
-    else if (gamepad1.b)
-        robot.cageIntake.setPosition(robot.cageIntake.getPosition()-0.1);
+    if (gamepad2.a)
+        robot.cageIntake.setPosition(1.0);
+    else if (gamepad2.b)
+        robot.cageIntake.setPosition(0.0);
+    else{
+        robot.cageIntake.setPosition(0.5);
+    }
 
     // Robot lift controls
         if(gamepad1.dpad_up){
@@ -83,6 +86,10 @@ public class TeleOpMode extends OpMode
         } else {
             robot.roboLift.setPower(0);
         }
+        if (gamepad1.a)
+            robot.markerDrop.setPosition(robot.markerDrop.getPosition()+0.005);
+        else if (gamepad1.b)
+            robot.markerDrop.setPosition(robot.markerDrop.getPosition()-0.005);
 
         // Show the elapsed game time and wheel power.
         telemetry.addData("Status", "Run Time: " + runtime.toString());
