@@ -86,6 +86,7 @@ public class TeleOpMode extends OpMode
         } else {
             robot.roboLift.setPower(0);
         }
+
         if (gamepad1.a)
             robot.markerDrop.setPosition(robot.markerDrop.getPosition()+0.005);
         else if (gamepad1.b)
