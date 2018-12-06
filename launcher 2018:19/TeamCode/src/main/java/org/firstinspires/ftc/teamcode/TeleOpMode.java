@@ -98,6 +98,7 @@ public class TeleOpMode extends OpMode
         telemetry.addData("Status", "Run Time: " + runtime.toString());
         telemetry.addData("Motors", "left (%.2f), right (%.2f)", leftPower, rightPower);
 //        telemetry.addData("Lifting Pos", "left (%.2f) right (%.2f", weed.cageLiftL.getCurrentPosition(), weed.cageLiftR.getCurrentPosition());
+        telemetry.addData("Angles", "heading (%.2f), roll (%.2f), pitch (%.2f)", robot.heading, robot.roll, robot.pitch);
         telemetry.update();
     }
 

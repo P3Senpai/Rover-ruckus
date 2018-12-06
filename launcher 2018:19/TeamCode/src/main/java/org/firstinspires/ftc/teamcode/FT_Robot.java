@@ -53,6 +53,11 @@ public class FT_Robot
     protected static final double INTAKE_IN_SPEED = 0.1;
     protected static final double INTAKE_OUT_SPEED = 0.9;
 
+    protected SensorIMU imuSensor =null;
+    protected double heading = imuSensor.angles.firstAngle;
+    protected double roll = imuSensor.angles.secondAngle;
+    protected double pitch = imuSensor.angles.thirdAngle;
+
     /* local OpMode members. */
     HardwareMap hwMap           =  null;
     private ElapsedTime period  = new ElapsedTime();
