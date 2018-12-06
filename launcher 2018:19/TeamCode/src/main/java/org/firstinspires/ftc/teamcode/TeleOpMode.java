@@ -71,11 +71,11 @@ public class TeleOpMode extends OpMode
 
     // cage intake code below
     if (gamepad2.a)
-        robot.cageIntake.setPosition(1.0);
+        robot.cageIntake.setPower(1.0);
     else if (gamepad2.b)
-        robot.cageIntake.setPosition(0.0);
+        robot.cageIntake.setPower(-1.0);
     else{
-        robot.cageIntake.setPosition(0.5);
+        robot.cageIntake.setPower(0.0);
     }
 
     // Robot lift controls
@@ -83,14 +83,16 @@ public class TeleOpMode extends OpMode
             robot.roboLift.setPower(1.0);
         }else if(gamepad1.dpad_down){
             robot.roboLift.setPower(-1.0);
-        } else {
-            robot.roboLift.setPower(0);
-        }
+        } else robot.roboLift.setPower(0);
 
+        // Marker Drop
         if (gamepad1.a)
-            robot.markerDrop.setPosition(robot.markerDrop.getPosition()+0.005);
+            robot.markerDrop.setPosition(0.2);  //TODO: make the servo a standard servo and NOT continuous
         else if (gamepad1.b)
-            robot.markerDrop.setPosition(robot.markerDrop.getPosition()-0.005);
+            robot.markerDrop.setPosition(0.8);
+        else{
+            robot.markerDrop.setPosition(0.5);
+        }
 
         // Show the elapsed game time and wheel power.
         telemetry.addData("Status", "Run Time: " + runtime.toString());

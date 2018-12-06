@@ -45,7 +45,7 @@ public class FT_Robot
     protected DcMotor  rightDriveB  = null;
     protected DcMotor  cageLiftL    = null;
     protected DcMotor  cageLiftR    = null;
-    protected Servo    cageIntake   = null;
+    protected DcMotor  cageIntake   = null;
     protected DcMotor  roboLift     = null;
     protected Servo    markerDrop    = null;
 
@@ -78,6 +78,8 @@ public class FT_Robot
         cageLiftR   = hwMap.get(DcMotor.class, "cage_lift_r");
             // Robot lifting
         roboLift    = hwMap.get(DcMotor.class, "robo_lift");
+            // Cage intake
+        cageIntake  = hwMap.get(DcMotor.class, "cage_intake");
 
         leftDriveF.setDirection(DcMotor.Direction.FORWARD); // Set to REVERSE if using AndyMark motors
         rightDriveF.setDirection(DcMotor.Direction.REVERSE);// Set to FORWARD if using AndyMark motors
@@ -95,18 +97,15 @@ public class FT_Robot
         cageLiftL.setPower(0);
         cageLiftR.setPower(0);
         roboLift.setPower(0);
+        cageIntake.setPower(0);
 
         // Set ground positions motor positions
 //        cageLiftL.setTargetPosition(0);
 //        cageLiftR.setTargetPosition(0);
         // TODO: add encoder init for the cage lift
 
-        //Initialize all servos
-        cageIntake  = hwMap.get(Servo.class, "cage_intake");
+        //Initialize all servo
         markerDrop  = hwMap.get(Servo.class, "marker_drop");
-
-        //Set servos to starting pos/pow
-        cageIntake.setPosition(0.5);
     }
  }
 
