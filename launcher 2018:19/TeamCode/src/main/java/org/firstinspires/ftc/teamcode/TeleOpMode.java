@@ -71,7 +71,7 @@ public class TeleOpMode extends OpMode
     robot.cageLiftR.setPower(rightLiftPow);
 
     // Automized lifting
-        // make reset encoders before setting pos                               // THIS SHOULD WORK IF CODE RUNS PROCEDURALLY
+        // make reset encoders before setting pos                    // THIS SHOULD WORK IF CODE RUNS PROCEDURALLY
         // if statement that only sets pos if on extremes and NOT when busy
         // Second button tracker (if pressed) that only runs motors to position
     if ((!robot.cageLiftL.isBusy() && !robot.cageLiftR.isBusy()) && robot.cageLiftR.getCurrentPosition() == robot.TOPLIFT){
@@ -91,13 +91,13 @@ public class TeleOpMode extends OpMode
     }
 
     // Automized crater lift
-        robot.overCrater(robot.heading); // TODO: Check if that is the right angle
+        robot.overCrater(robot.heading);    // TODO: Check if that is the right angle
 
     // cage intake code below
     if (gamepad2.a)
-        robot.cageIntake.setPower(1.0);
+        robot.cageIntake.setPower(robot.INTAKE_SPEED);
     else if (gamepad2.b)
-        robot.cageIntake.setPower(-1.0);
+        robot.cageIntake.setPower(robot.INTAKE_SPEED_OUT);
     else
         robot.cageIntake.setPower(0.0);
 

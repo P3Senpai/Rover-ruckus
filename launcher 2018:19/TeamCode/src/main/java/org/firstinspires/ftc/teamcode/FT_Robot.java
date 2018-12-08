@@ -63,29 +63,27 @@ public class FT_Robot
     /* Preset Values */
         // Intake speeds
         protected final static double INTAKE_SPEED = -1.0;
-        protected final static double INTAKE_SPEEP_OUT = 1.0;
+        protected final static double INTAKE_SPEED_OUT = 1.0;
 
-        // Lifting position
-        protected final static int TOPLIFT = 1000;          // TODO: Check all of the encoder numbers
+        // Lifting position         // TODO: Check all of the encoder numbers
+        protected final static int TOPLIFT = 1000;
         protected final static int GROUNDLIFT = 0;
         protected final static int CRATERLIFT = 200;
 
-        // IMU initialized variables
-        protected double heading = imuSensor.angles.firstAngle;
-        protected double roll = imuSensor.angles.secondAngle;
+    // IMU initialized variables   // TODO: I don't know if these variable will update automatically
+    protected double heading = imuSensor.angles.firstAngle;
+    protected double roll = imuSensor.angles.secondAngle;
         protected double pitch = imuSensor.angles.thirdAngle;
 
         // Calibrated angle on flat surface
-        protected final double FLAT_SOURCE =  0.0;           // TODO: Calibrate every time you go somewhere new
+        protected final double FLAT_SOURCE =  0.0;   // TODO: Calibrate every time you go somewhere new
 
     /* local OpMode members. */
     HardwareMap hwMap           =  null;
     private ElapsedTime period  = new ElapsedTime();
 
     /* Constructor */
-    public FT_Robot(){
-
-    }
+    public FT_Robot(){}
 
     /* Initialize TeleOp Hardware interfaces */
     public void initTeleOp(HardwareMap ahwMap) {
