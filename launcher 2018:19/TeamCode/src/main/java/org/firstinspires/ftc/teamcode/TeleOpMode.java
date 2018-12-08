@@ -90,6 +90,9 @@ public class TeleOpMode extends OpMode
         robot.cageLiftR.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
     }
 
+    // Automized crater lift
+        robot.overCrater(robot.heading); // TODO: Check if that is the right angle
+
     // cage intake code below
     if (gamepad2.a)
         robot.cageIntake.setPower(1.0);
@@ -151,5 +154,4 @@ public class TeleOpMode extends OpMode
 //       }
             return "Nothing";
     }
-
 }

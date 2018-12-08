@@ -66,13 +66,17 @@ public class FT_Robot
         protected final static double INTAKE_SPEEP_OUT = 1.0;
 
         // Lifting position
-        protected final static int TOPLIFT = 1000;
+        protected final static int TOPLIFT = 1000;          // TODO: Check all of the encoder numbers
         protected final static int GROUNDLIFT = 0;
+        protected final static int CRATERLIFT = 200;
 
         // IMU initialized variables
         protected double heading = imuSensor.angles.firstAngle;
         protected double roll = imuSensor.angles.secondAngle;
         protected double pitch = imuSensor.angles.thirdAngle;
+
+        // Calibrated angle on flat surface
+        protected final double FLAT_SOURCE =  0.0;           // TODO: Calibrate every time you go somewhere new
 
     /* local OpMode members. */
     HardwareMap hwMap           =  null;
@@ -183,6 +187,19 @@ public class FT_Robot
 
         //Initialize all servo
         markerDrop  = hwMap.get(Servo.class, "marker_drop");
+    }
+    public void overCrater (double currentAngle){
+        if((currentAngle > (FLAT_SOURCE+3)) || (currentAngle < (FLAT_SOURCE-3))){
+            cageLiftL.setTargetPosition(CRATERLIFT);
+            cageLiftR.setTargetPosition(CRATERLIFT);
+            cageLiftL.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            cageLiftR.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        } else {
+            cageLiftL.setTargetPosition(GROUNDLIFT);
+            cageLiftR.setTargetPosition(GROUNDLIFT);
+            cageLiftL.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            cageLiftR.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        }
     }
  }
 
