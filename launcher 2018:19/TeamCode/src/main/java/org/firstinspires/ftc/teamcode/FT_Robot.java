@@ -33,30 +33,46 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.hardware.VoltageSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
 public class FT_Robot
 {
-    /* Public OpMode members. */
-    protected DcMotor  leftDriveF   = null;
-    protected DcMotor  rightDriveF  = null;
-    protected DcMotor  leftDriveB   = null;
-    protected DcMotor  rightDriveB  = null;
-    protected DcMotor  cageLiftL    = null;
-    protected DcMotor  cageLiftR    = null;
-    protected DcMotor  cageIntake   = null;
-    protected DcMotor  roboLift     = null;
-    protected Servo    markerDrop    = null;
+    /* Dc motors  */
+        // Drive train motors
+        protected DcMotor  leftDriveF   = null;
+        protected DcMotor  rightDriveF  = null;
+        protected DcMotor  leftDriveB   = null;
+        protected DcMotor  rightDriveB  = null;
+        // Cage Lift and Intake motors
+        protected DcMotor  cageLiftL    = null;
+        protected DcMotor  cageLiftR    = null;
+        protected DcMotor  cageIntake   = null;
+        // Robot lift motor
+        protected DcMotor  roboLift     = null;
 
-    protected static final double SPEED_REDUCTION = 0.9;
-    protected static final double INTAKE_IN_SPEED = 0.1;
-    protected static final double INTAKE_OUT_SPEED = 0.9;
+        protected VoltageSensor volts = null;
 
-    protected SensorIMU imuSensor =null;
-    protected double heading = imuSensor.angles.firstAngle;
-    protected double roll = imuSensor.angles.secondAngle;
-    protected double pitch = imuSensor.angles.thirdAngle;
+    /* Servos */
+        protected Servo    markerDrop    = null;
+
+    /* Sensors */
+        protected SensorIMU imuSensor =null;
+
+    /* Preset Values */
+        // Intake speeds
+        protected final static double INTAKE_SPEED = -1.0;
+        protected final static double INTAKE_SPEEP_OUT = 1.0;
+
+        // Lifting position
+        protected final static int TOPLIFT = 1000;
+        protected final static int GROUNDLIFT = 0;
+
+        // IMU initialized variables
+        protected double heading = imuSensor.angles.firstAngle;
+        protected double roll = imuSensor.angles.secondAngle;
+        protected double pitch = imuSensor.angles.thirdAngle;
 
     /* local OpMode members. */
     HardwareMap hwMap           =  null;
@@ -67,8 +83,8 @@ public class FT_Robot
 
     }
 
-    /* Initialize standard Hardware interfaces */
-    public void init(HardwareMap ahwMap) {
+    /* Initialize TeleOp Hardware interfaces */
+    public void initTeleOp(HardwareMap ahwMap) {
         // Save reference to Hardware map
         hwMap = ahwMap;
 
@@ -103,6 +119,62 @@ public class FT_Robot
         cageLiftR.setPower(0);
         roboLift.setPower(0);
         cageIntake.setPower(0);
+
+        cageLiftL.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        cageLiftR.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+
+        // Set ground positions motor positions
+//        cageLiftL.setTargetPosition(0);
+//        cageLiftR.setTargetPosition(0);
+        // TODO: add encoder init for the cage lift
+
+        //Initialize all servo
+        markerDrop  = hwMap.get(Servo.class, "marker_drop");
+    }
+    public void initAutonomous(HardwareMap ahwMap) {
+        // Save reference to Hardware map
+        hwMap = ahwMap;
+
+        // Define and Initialize Motors
+        // Drive train
+        leftDriveF  = hwMap.get(DcMotor.class, "left_drive_f");
+        rightDriveF = hwMap.get(DcMotor.class, "right_drive_f");
+        leftDriveB  = hwMap.get(DcMotor.class, "left_drive_b");
+        rightDriveB = hwMap.get(DcMotor.class, "right_drive_b");
+        // Cage Lift
+        cageLiftL   = hwMap.get(DcMotor.class, "cage_lift_l");
+        cageLiftR   = hwMap.get(DcMotor.class, "cage_lift_r");
+        // Robot lifting
+        roboLift    = hwMap.get(DcMotor.class, "robo_lift");
+        // Cage intake
+        cageIntake  = hwMap.get(DcMotor.class, "cage_intake");
+
+        leftDriveF.setDirection(DcMotor.Direction.FORWARD); // Set to REVERSE if using AndyMark motors
+        rightDriveF.setDirection(DcMotor.Direction.REVERSE);// Set to FORWARD if using AndyMark motors
+        leftDriveB.setDirection(DcMotor.Direction.FORWARD); // Set to REVERSE if using AndyMark motors
+        rightDriveB.setDirection(DcMotor.Direction.REVERSE);// Set to FORWARD if using AndyMark motors
+        cageLiftL.setDirection(DcMotor.Direction.FORWARD);
+        cageLiftR.setDirection(DcMotor.Direction.REVERSE);
+
+
+        // Set all motors to zero power
+        leftDriveF.setPower(0);
+        rightDriveF.setPower(0);
+        leftDriveB.setPower(0);
+        rightDriveB.setPower(0);
+        cageLiftL.setPower(0);
+        cageLiftR.setPower(0);
+        roboLift.setPower(0);
+        cageIntake.setPower(0);
+
+        // Reset Encoders
+        leftDriveF.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        leftDriveB.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        rightDriveF.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        rightDriveB.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        roboLift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        cageLiftL.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        cageLiftR.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
         // Set ground positions motor positions
 //        cageLiftL.setTargetPosition(0);

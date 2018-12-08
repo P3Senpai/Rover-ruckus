@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
@@ -24,7 +25,7 @@ public class TeleOpMode extends OpMode
 
     @Override
     public void init() {
-        robot.init(hardwareMap);
+        robot.initTeleOp(hardwareMap);
     }
 
     /*
@@ -69,21 +70,43 @@ public class TeleOpMode extends OpMode
     robot.cageLiftL.setPower(leftLiftPow);
     robot.cageLiftR.setPower(rightLiftPow);
 
+    // Automized lifting
+        // make reset encoders before setting pos                               // THIS SHOULD WORK IF CODE RUNS PROCEDURALLY
+        // if statement that only sets pos if on extremes and NOT when busy
+        // Second button tracker (if pressed) that only runs motors to position
+    if ((!robot.cageLiftL.isBusy() && !robot.cageLiftR.isBusy()) && robot.cageLiftR.getCurrentPosition() == robot.TOPLIFT){
+        robot.cageLiftR.setTargetPosition(robot.GROUNDLIFT);
+        robot.cageLiftL.setTargetPosition(robot.GROUNDLIFT);
+    } else if ((!robot.cageLiftL.isBusy() && !robot.cageLiftR.isBusy()) && robot.cageLiftR.getCurrentPosition() == robot.GROUNDLIFT){
+        robot.cageLiftR.setTargetPosition(robot.TOPLIFT);
+        robot.cageLiftL.setTargetPosition(robot.TOPLIFT);
+    }
+
+    if( (!robot.cageLiftL.isBusy() && !robot.cageLiftR.isBusy()) && gamepad1.y){
+        robot.cageLiftL.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        robot.cageLiftR.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+    } else {
+        robot.cageLiftL.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        robot.cageLiftR.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+    }
+
     // cage intake code below
     if (gamepad2.a)
         robot.cageIntake.setPower(1.0);
     else if (gamepad2.b)
         robot.cageIntake.setPower(-1.0);
-    else{
+    else
         robot.cageIntake.setPower(0.0);
-    }
+
 
     // Robot lift controls
-        if(gamepad1.dpad_up){
-            robot.roboLift.setPower(1.0);
-        }else if(gamepad1.dpad_down){
-            robot.roboLift.setPower(-1.0);
-        } else robot.roboLift.setPower(0);
+    if(gamepad1.dpad_up)
+        robot.roboLift.setPower(1.0);
+    else if(gamepad1.dpad_down)
+        robot.roboLift.setPower(-1.0);
+    else
+        robot.roboLift.setPower(0);
+
 
         // Marker Drop
         if (gamepad1.a)
@@ -97,8 +120,9 @@ public class TeleOpMode extends OpMode
         // Show the elapsed game time and wheel power.
         telemetry.addData("Status", "Run Time: " + runtime.toString());
         telemetry.addData("Motors", "left (%.2f), right (%.2f)", leftPower, rightPower);
-//        telemetry.addData("Lifting Pos", "left (%.2f) right (%.2f", weed.cageLiftL.getCurrentPosition(), weed.cageLiftR.getCurrentPosition());
-        telemetry.addData("Angles", "heading (%.2f), roll (%.2f), pitch (%.2f)", robot.heading, robot.roll, robot.pitch);
+//        telemetry.addData("Lifting Pos", "left (%.2f) right (%.2f", robot.cageLiftL.getCurrentPosition(), robot.cageLiftR.getCurrentPosition());
+        telemetry.addData("Angles: ", "heading (%.2f), roll (%.2f), pitch (%.2f)", robot.heading, robot.roll, robot.pitch);
+        telemetry.addData("Voltage", "volts ($.4f)", robot.volts.getVoltage());
         telemetry.update();
     }
 
