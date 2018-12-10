@@ -74,12 +74,12 @@ public class TeleOpMode extends OpMode
         // make reset encoders before setting pos                    // THIS SHOULD WORK IF CODE RUNS PROCEDURALLY
         // if statement that only sets pos if on extremes and NOT when busy
         // Second button tracker (if pressed) that only runs motors to position
-    if ((!robot.cageLiftL.isBusy() && !robot.cageLiftR.isBusy()) && robot.cageLiftR.getCurrentPosition() == robot.TOPLIFT){
-        robot.cageLiftR.setTargetPosition(robot.GROUNDLIFT);
-        robot.cageLiftL.setTargetPosition(robot.GROUNDLIFT);
-    } else if ((!robot.cageLiftL.isBusy() && !robot.cageLiftR.isBusy()) && robot.cageLiftR.getCurrentPosition() == robot.GROUNDLIFT){
-        robot.cageLiftR.setTargetPosition(robot.TOPLIFT);
-        robot.cageLiftL.setTargetPosition(robot.TOPLIFT);
+    if ((!robot.cageLiftL.isBusy() && !robot.cageLiftR.isBusy()) && robot.cageLiftR.getCurrentPosition() == robot.TOP_LIFT){
+        robot.cageLiftR.setTargetPosition(robot.GROUND_LIFT);
+        robot.cageLiftL.setTargetPosition(robot.GROUND_LIFT);
+    } else if ((!robot.cageLiftL.isBusy() && !robot.cageLiftR.isBusy()) && robot.cageLiftR.getCurrentPosition() == robot.GROUND_LIFT){
+        robot.cageLiftR.setTargetPosition(robot.TOP_LIFT);
+        robot.cageLiftL.setTargetPosition(robot.TOP_LIFT);
     }
 
     if( (!robot.cageLiftL.isBusy() && !robot.cageLiftR.isBusy()) && gamepad1.y){
@@ -91,7 +91,7 @@ public class TeleOpMode extends OpMode
     }
 
     // Automized crater lift
-        robot.overCrater(robot.heading);    // TODO: Check if that is the right angle
+        robot.overCrater(robot.roll);    // TODO: Check if that is the right angle
 
     // cage intake code below
     if (gamepad2.a)

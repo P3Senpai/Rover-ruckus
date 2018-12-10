@@ -30,12 +30,10 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.VoltageSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
-import com.qualcomm.robotcore.util.Range;
 
 public class FT_Robot
 {
@@ -52,13 +50,13 @@ public class FT_Robot
         // Robot lift motor
         protected DcMotor  roboLift     = null;
 
-        protected VoltageSensor volts = null;
+        protected VoltageSensor volts   = null;
 
     /* Servos */
-        protected Servo    markerDrop    = null;
+        protected Servo    markerDrop   = null;
 
     /* Sensors */
-        protected SensorIMU imuSensor =null;
+        protected SensorIMU imuSensor   = null;
 
     /* Preset Values */
         // Intake speeds
@@ -66,17 +64,17 @@ public class FT_Robot
         protected final static double INTAKE_SPEED_OUT = 1.0;
 
         // Lifting position         // TODO: Check all of the encoder numbers
-        protected final static int TOPLIFT = 1000;
-        protected final static int GROUNDLIFT = 0;
-        protected final static int CRATERLIFT = 200;
+        protected final int TOP_LIFT = 1000;
+        protected final int GROUND_LIFT = 0;
+        protected final int CRATER_LIFT = 200;
 
     // IMU initialized variables   // TODO: I don't know if these variable will update automatically
-    protected double heading = imuSensor.angles.firstAngle;
-    protected double roll = imuSensor.angles.secondAngle;
-        protected double pitch = imuSensor.angles.thirdAngle;
+        protected float heading = imuSensor.angles.firstAngle;
+        protected float roll = imuSensor.angles.secondAngle;
+        protected float pitch = imuSensor.angles.thirdAngle;
 
         // Calibrated angle on flat surface
-        protected final double FLAT_SOURCE =  0.0;   // TODO: Calibrate every time you go somewhere new
+        protected final double FLAT_SOURCE =  85.0;   // TODO: Calibrate every time you go somewhere new
 
     /* local OpMode members. */
     HardwareMap hwMap           =  null;
@@ -186,15 +184,17 @@ public class FT_Robot
         //Initialize all servo
         markerDrop  = hwMap.get(Servo.class, "marker_drop");
     }
+
+    /* Methods for all op modes*/
     public void overCrater (double currentAngle){
-        if((currentAngle > (FLAT_SOURCE+3)) || (currentAngle < (FLAT_SOURCE-3))){
-            cageLiftL.setTargetPosition(CRATERLIFT);
-            cageLiftR.setTargetPosition(CRATERLIFT);
+        if((currentAngle > (FLAT_SOURCE + 4)) || (currentAngle < (FLAT_SOURCE - 4))){
+            cageLiftL.setTargetPosition(CRATER_LIFT);
+            cageLiftR.setTargetPosition(CRATER_LIFT);
             cageLiftL.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             cageLiftR.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         } else {
-            cageLiftL.setTargetPosition(GROUNDLIFT);
-            cageLiftR.setTargetPosition(GROUNDLIFT);
+            cageLiftL.setTargetPosition(GROUND_LIFT);
+            cageLiftR.setTargetPosition(GROUND_LIFT);
             cageLiftL.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             cageLiftR.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         }
