@@ -67,8 +67,8 @@ public class TeleOpMode extends OpMode
     double leftLiftPow  = Range.clip(gamepad2.left_stick_y, -1.0, 1.0);
     double rightLiftPow = Range.clip(gamepad2.right_stick_y, -1.0, 1.0);
 
-    robot.cageLiftL.setPower(leftLiftPow);
-    robot.cageLiftR.setPower(rightLiftPow);
+    robot.cageLiftL.setPower(leftLiftPow * 0.5);
+    robot.cageLiftR.setPower(rightLiftPow * 0.5);
 
     // Automized lifting
         // make reset encoders before setting pos                    // THIS SHOULD WORK IF CODE RUNS PROCEDURALLY
@@ -91,7 +91,7 @@ public class TeleOpMode extends OpMode
     }
 
     // Automized crater lift
-        robot.overCrater(robot.roll);    // TODO: Check if that is the right angle
+//        robot.overCrater();    // TODO: Check if that is the right angle
 
     // cage intake code below
     if (gamepad2.a)
@@ -124,8 +124,10 @@ public class TeleOpMode extends OpMode
         telemetry.addData("Status", "Run Time: " + runtime.toString());
         telemetry.addData("Motors", "left (%.2f), right (%.2f)", leftPower, rightPower);
 //        telemetry.addData("Lifting Pos", "left (%.2f) right (%.2f", robot.cageLiftL.getCurrentPosition(), robot.cageLiftR.getCurrentPosition());
-        telemetry.addData("Angles: ", "heading (%.2f), roll (%.2f), pitch (%.2f)", robot.heading, robot.roll, robot.pitch);
-        telemetry.addData("Voltage", "volts ($.4f)", robot.volts.getVoltage());
+//        telemetry.addData("Angles: ", "heading (%.2f), roll (%.2f), pitch (%.2f)", robot.heading, robot.roll, robot.pitch);
+//        telemetry.addData("Voltage", "volts ($.4f)", robot.volts.getVoltage());
+//        telemetry.addData("Jangles:", "(%.2f)", robot.imuSensor.angles.secondAngle);
+
         telemetry.update();
     }
 

@@ -58,10 +58,12 @@ public class FT_Robot
     /* Sensors */
         protected SensorIMU imuSensor   = null;
 
+
+
     /* Preset Values */
         // Intake speeds
-        protected final static double INTAKE_SPEED = -1.0;
-        protected final static double INTAKE_SPEED_OUT = 1.0;
+        protected final static double INTAKE_SPEED = 1.0;
+        protected final static double INTAKE_SPEED_OUT = -1.0;
 
         // Lifting position         // TODO: Check all of the encoder numbers
         protected final int TOP_LIFT = 1000;
@@ -69,9 +71,9 @@ public class FT_Robot
         protected final int CRATER_LIFT = 200;
 
     // IMU initialized variables   // TODO: I don't know if these variable will update automatically
-        protected float heading = imuSensor.angles.firstAngle;
-        protected float roll = imuSensor.angles.secondAngle;
-        protected float pitch = imuSensor.angles.thirdAngle;
+//        protected float heading = imuSensor.angles.firstAngle;
+//        protected float roll = imuSensor.angles.secondAngle;
+//        protected float pitch = imuSensor.angles.thirdAngle;
 
         // Calibrated angle on flat surface
         protected final double FLAT_SOURCE =  85.0;   // TODO: Calibrate every time you go somewhere new
