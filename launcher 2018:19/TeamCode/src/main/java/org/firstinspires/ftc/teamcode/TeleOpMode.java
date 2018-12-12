@@ -64,11 +64,10 @@ public class TeleOpMode extends OpMode
     robot.rightDriveB.setPower(rightPower);
 
     // Manual lift code below
-    double leftLiftPow  = Range.clip(gamepad2.left_stick_y, -1.0, 1.0);
-    double rightLiftPow = Range.clip(gamepad2.right_stick_y, -1.0, 1.0);
-
-    robot.cageLiftL.setPower(leftLiftPow * 0.5);
-    robot.cageLiftR.setPower(rightLiftPow * 0.5);
+        double leftLiftPow  = Range.clip(gamepad2.left_stick_y, -1.0, 1.0);
+        double rightLiftPow = Range.clip(gamepad2.right_stick_y, -1.0, 1.0);
+        robot.cageLiftL.setPower(leftLiftPow * 0.5);
+        robot.cageLiftR.setPower(rightLiftPow * 0.5);
 
     // Automized lifting
         // make reset encoders before setting pos                    // THIS SHOULD WORK IF CODE RUNS PROCEDURALLY
@@ -123,11 +122,6 @@ public class TeleOpMode extends OpMode
         // Show the elapsed game time and wheel power.
         telemetry.addData("Status", "Run Time: " + runtime.toString());
         telemetry.addData("Motors", "left (%.2f), right (%.2f)", leftPower, rightPower);
-//        telemetry.addData("Lifting Pos", "left (%.2f) right (%.2f", robot.cageLiftL.getCurrentPosition(), robot.cageLiftR.getCurrentPosition());
-//        telemetry.addData("Angles: ", "heading (%.2f), roll (%.2f), pitch (%.2f)", robot.heading, robot.roll, robot.pitch);
-//        telemetry.addData("Voltage", "volts ($.4f)", robot.volts.getVoltage());
-//        telemetry.addData("Jangles:", "(%.2f)", robot.imuSensor.angles.secondAngle);
-
         telemetry.update();
     }
 

@@ -85,7 +85,7 @@ public class FT_Robot
     /* Constructor */
     public FT_Robot(){}
 
-    /* Initialize TeleOp Hardware interfaces */
+    /* Initialize Hardware interfaces */
     public void initTeleOp(HardwareMap ahwMap) {
         // Save reference to Hardware map
         hwMap = ahwMap;
