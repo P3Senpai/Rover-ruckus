@@ -46,6 +46,8 @@ public class FT_Robot
         // Cage Lift and Intake motors
         protected DcMotor  cageLiftL    = null;
         protected DcMotor  cageLiftR    = null;
+        protected DcMotor  cageLiftLAuto = null;        // TODO: test if have two motor hwmap to the same name breaks app
+        protected DcMotor  cageLiftRAuto = null;
         protected DcMotor  cageIntake   = null;
         // Robot lift motor
         protected DcMotor  roboLift     = null;
@@ -70,10 +72,8 @@ public class FT_Robot
         protected final int GROUND_LIFT = 0;
         protected final int CRATER_LIFT = 200;
 
-    // IMU initialized variables   // TODO: I don't know if these variable will update automatically
-//        protected float heading = imuSensor.angles.firstAngle;
-//        protected float roll = imuSensor.angles.secondAngle;
-//        protected float pitch = imuSensor.angles.thirdAngle;
+    // IMU initialized variables
+    // TODO: Add functional IMU values AND check if they update automatically in the tele op mode
 
         // Calibrated angle on flat surface
         protected final double FLAT_SOURCE =  85.0;   // TODO: Calibrate every time you go somewhere new
@@ -99,15 +99,22 @@ public class FT_Robot
             // Cage Lift
         cageLiftL   = hwMap.get(DcMotor.class, "cage_lift_l");
         cageLiftR   = hwMap.get(DcMotor.class, "cage_lift_r");
+
+        // TODO: check if setting 2 different motors to 1 hwmap works
+        cageLiftLAuto   = hwMap.get(DcMotor.class, "cage_lift_l");
+        cageLiftRAuto   = hwMap.get(DcMotor.class, "cage_lift_r");
             // Robot lifting
         roboLift    = hwMap.get(DcMotor.class, "robo_lift");
             // Cage intake
         cageIntake  = hwMap.get(DcMotor.class, "cage_intake");
 
-        leftDriveF.setDirection(DcMotor.Direction.FORWARD); // Set to REVERSE if using AndyMark motors
-        rightDriveF.setDirection(DcMotor.Direction.REVERSE);// Set to FORWARD if using AndyMark motors
-        leftDriveB.setDirection(DcMotor.Direction.FORWARD); // Set to REVERSE if using AndyMark motors
-        rightDriveB.setDirection(DcMotor.Direction.REVERSE);// Set to FORWARD if using AndyMark motors
+        // Set drive train directions to motors
+        leftDriveF.setDirection(DcMotor.Direction.FORWARD);
+        rightDriveF.setDirection(DcMotor.Direction.REVERSE);
+        leftDriveB.setDirection(DcMotor.Direction.FORWARD);
+        rightDriveB.setDirection(DcMotor.Direction.REVERSE);
+
+        // todo: Check if direction set for cage lift motors is necessary
         cageLiftL.setDirection(DcMotor.Direction.FORWARD);
         cageLiftR.setDirection(DcMotor.Direction.REVERSE);
 
@@ -122,83 +129,46 @@ public class FT_Robot
         roboLift.setPower(0);
         cageIntake.setPower(0);
 
-        cageLiftL.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        cageLiftR.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        // Cage lift manual controls init
+        cageLiftL.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        cageLiftR.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
-        // Set ground positions motor positions
-//        cageLiftL.setTargetPosition(0);
-//        cageLiftR.setTargetPosition(0);
-        // TODO: add encoder init for the cage lift
+        // Auto encoders control
+        cageLiftLAuto.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        cageLiftRAuto.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        cageLiftLAuto.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        cageLiftRAuto.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
-        //Initialize all servo
-        markerDrop  = hwMap.get(Servo.class, "marker_drop");
-    }
-    public void initAutonomous(HardwareMap ahwMap) {
-        // Save reference to Hardware map
-        hwMap = ahwMap;
-
-        // Define and Initialize Motors
-        // Drive train
-        leftDriveF  = hwMap.get(DcMotor.class, "left_drive_f");
-        rightDriveF = hwMap.get(DcMotor.class, "right_drive_f");
-        leftDriveB  = hwMap.get(DcMotor.class, "left_drive_b");
-        rightDriveB = hwMap.get(DcMotor.class, "right_drive_b");
-        // Cage Lift
-        cageLiftL   = hwMap.get(DcMotor.class, "cage_lift_l");
-        cageLiftR   = hwMap.get(DcMotor.class, "cage_lift_r");
-        // Robot lifting
-        roboLift    = hwMap.get(DcMotor.class, "robo_lift");
-        // Cage intake
-        cageIntake  = hwMap.get(DcMotor.class, "cage_intake");
-
-        leftDriveF.setDirection(DcMotor.Direction.FORWARD); // Set to REVERSE if using AndyMark motors
-        rightDriveF.setDirection(DcMotor.Direction.REVERSE);// Set to FORWARD if using AndyMark motors
-        leftDriveB.setDirection(DcMotor.Direction.FORWARD); // Set to REVERSE if using AndyMark motors
-        rightDriveB.setDirection(DcMotor.Direction.REVERSE);// Set to FORWARD if using AndyMark motors
-        cageLiftL.setDirection(DcMotor.Direction.FORWARD);
-        cageLiftR.setDirection(DcMotor.Direction.REVERSE);
-
-
-        // Set all motors to zero power
-        leftDriveF.setPower(0);
-        rightDriveF.setPower(0);
-        leftDriveB.setPower(0);
-        rightDriveB.setPower(0);
-        cageLiftL.setPower(0);
-        cageLiftR.setPower(0);
-        roboLift.setPower(0);
-        cageIntake.setPower(0);
-
-        // Reset Encoders
-        leftDriveF.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        leftDriveB.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        rightDriveF.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        rightDriveB.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        roboLift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        cageLiftL.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        cageLiftR.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-
-        // Set ground positions motor positions
-//        cageLiftL.setTargetPosition(0);
-//        cageLiftR.setTargetPosition(0);
-        // TODO: add encoder init for the cage lift
+        // TODO: For init set ground positions to lift motors positions
 
         //Initialize all servo
         markerDrop  = hwMap.get(Servo.class, "marker_drop");
+
+        //TODO: add starting pos of ALL servos
+
     }
+
+    // TODO: add ALL hwmap init to method below
+    public void initAutonomous(HardwareMap ahwMap) {}
 
     /* Methods for all op modes*/
+
+    // TODO: Correct degree variation in if statement so that it works well
     public void overCrater (double currentAngle){
         if((currentAngle > (FLAT_SOURCE + 4)) || (currentAngle < (FLAT_SOURCE - 4))){
             cageLiftL.setTargetPosition(CRATER_LIFT);
             cageLiftR.setTargetPosition(CRATER_LIFT);
             cageLiftL.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             cageLiftR.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            cageLiftL.setPower(0.2);
+            cageLiftR.setPower(0.2);
         } else {
             cageLiftL.setTargetPosition(GROUND_LIFT);
             cageLiftR.setTargetPosition(GROUND_LIFT);
             cageLiftL.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             cageLiftR.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            cageLiftL.setPower(0.2);
+            cageLiftR.setPower(0.2);
         }
     }
  }
