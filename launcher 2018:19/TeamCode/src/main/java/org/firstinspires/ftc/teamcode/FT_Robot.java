@@ -154,7 +154,7 @@ public class FT_Robot
     /* Methods for all op modes*/
 
     // TODO: Correct degree variation in if statement so that it works well
-    public void overCrater (double currentAngle){
+    public boolean overCrater (double currentAngle){
         if((currentAngle > (FLAT_SOURCE + 4)) || (currentAngle < (FLAT_SOURCE - 4))){
             cageLiftL.setTargetPosition(CRATER_LIFT);
             cageLiftR.setTargetPosition(CRATER_LIFT);
@@ -162,6 +162,7 @@ public class FT_Robot
             cageLiftR.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             cageLiftL.setPower(0.2);
             cageLiftR.setPower(0.2);
+            return true;
         } else {
             cageLiftL.setTargetPosition(GROUND_LIFT);
             cageLiftR.setTargetPosition(GROUND_LIFT);
@@ -169,6 +170,14 @@ public class FT_Robot
             cageLiftR.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             cageLiftL.setPower(0.2);
             cageLiftR.setPower(0.2);
+            return false;
+        }
+    }
+    public boolean liftIsBusy(){
+        if (cageLiftL.isBusy() && cageLiftR.isBusy()){
+            return true;
+        } else{
+            return false;
         }
     }
  }
