@@ -35,59 +35,58 @@ import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.VoltageSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-public class FT_Robot
-{
+public class FT_Robot {
     /* Dc motors  */
-        // Drive train motors
-        protected DcMotor  leftDriveF   = null;
-        protected DcMotor  rightDriveF  = null;
-        protected DcMotor  leftDriveB   = null;
-        protected DcMotor  rightDriveB  = null;
-        // Cage Lift and Intake motors
-        protected DcMotor  cageLiftL    = null;
-        protected DcMotor  cageLiftR    = null;
-        protected DcMotor  cageIntake   = null;
+    // Drive train motors
+    protected DcMotor leftDriveF = null;
+    protected DcMotor rightDriveF = null;
+    protected DcMotor leftDriveB = null;
+    protected DcMotor rightDriveB = null;
+    // Cage Lift and Intake motors
+    protected DcMotor cageLiftL = null;
+    protected DcMotor cageLiftR = null;
+    protected DcMotor cageIntake = null;
 
-        protected DcMotor  cageLiftLAuto = null; // TODO: test if have two motor hwmap to the same name breaks app
-        protected DcMotor  cageLiftRAuto = null;
-        // Robot lift motor
-        protected DcMotor  roboLift     = null;
+    protected DcMotor cageLiftLAuto = null; // TODO: test if have two motor hwmap to the same name breaks app
+    protected DcMotor cageLiftRAuto = null;
+    // Robot lift motor
+    protected DcMotor roboLift = null;
 
-        protected VoltageSensor volts   = null;
+    protected VoltageSensor volts = null;
 
     /* Servos */
-        protected Servo    markerDrop   = null;
+    protected Servo markerDrop = null;
 
     /* Sensors */
-        protected SensorIMU imuSensor   = null;
-
+    protected SensorIMU imuSensor = null;
 
 
     /* Preset Values */
-        // Intake speeds
-        protected final static double INTAKE_SPEED = 1.0;
-        protected final static double INTAKE_SPEED_OUT = -0.4;
+    // Intake speeds
+    protected final static double INTAKE_SPEED = 1.0;
+    protected final static double INTAKE_SPEED_OUT = -0.4;
 
-        // Lifting position         // TODO: Check all of the encoder numbers
-        protected final int TOP_LIFT = 1000;
-        protected final int GROUND_LIFT = 0;
-        protected final int CRATER_LIFT = 200;
+    // Lifting position         // TODO: Check all of the encoder numbers
+    protected final int TOP_LIFT = 1000;
+    protected final int GROUND_LIFT = 0;
+    protected final int CRATER_LIFT = 200;
 
-        //Other values
-        protected boolean lastLiftB = false;
+    //Other values
+    protected boolean lastLiftB = false;
 
     // IMU initialized variables
     // TODO: Add functional IMU values AND check if they update automatically in the tele op mode
 
-        // Calibrated angle on flat surface
-        protected final double FLAT_SOURCE =  85.0;   // TODO: Calibrate every time you go somewhere new
+    // Calibrated angle on flat surface
+    protected final double FLAT_SOURCE = 85.0;   // TODO: Calibrate every time you go somewhere new
 
     /* local OpMode members. */
-    HardwareMap hwMap           =  null;
-    private ElapsedTime period  = new ElapsedTime();
+    HardwareMap hwMap = null;
+    private ElapsedTime period = new ElapsedTime();
 
     /* Constructor */
-    public FT_Robot(){}
+    public FT_Robot() {
+    }
 
     /* Initialize Hardware interfaces */
     public void initTeleOp(HardwareMap ahwMap) {
@@ -95,22 +94,22 @@ public class FT_Robot
         hwMap = ahwMap;
 
         // Define and Initialize Motors
-            // Drive train
-        leftDriveF  = hwMap.get(DcMotor.class, "left_drive_f");
+        // Drive train
+        leftDriveF = hwMap.get(DcMotor.class, "left_drive_f");
         rightDriveF = hwMap.get(DcMotor.class, "right_drive_f");
-        leftDriveB  = hwMap.get(DcMotor.class, "left_drive_b");
+        leftDriveB = hwMap.get(DcMotor.class, "left_drive_b");
         rightDriveB = hwMap.get(DcMotor.class, "right_drive_b");
-            // Cage Lift
-        cageLiftL   = hwMap.get(DcMotor.class, "cage_lift_l");
-        cageLiftR   = hwMap.get(DcMotor.class, "cage_lift_r");
+        // Cage Lift
+        cageLiftL = hwMap.get(DcMotor.class, "cage_lift_l");
+        cageLiftR = hwMap.get(DcMotor.class, "cage_lift_r");
 
         // TODO: check if setting 2 different motors to 1 hwmap works
-        cageLiftLAuto   = hwMap.get(DcMotor.class, "cage_lift_l");
-        cageLiftRAuto   = hwMap.get(DcMotor.class, "cage_lift_r");
-            // Robot lifting
-        roboLift    = hwMap.get(DcMotor.class, "robo_lift");
-            // Cage intake
-        cageIntake  = hwMap.get(DcMotor.class, "cage_intake");
+        cageLiftLAuto = hwMap.get(DcMotor.class, "cage_lift_l");
+        cageLiftRAuto = hwMap.get(DcMotor.class, "cage_lift_r");
+        // Robot lifting
+        roboLift = hwMap.get(DcMotor.class, "robo_lift");
+        // Cage intake
+        cageIntake = hwMap.get(DcMotor.class, "cage_intake");
 
         // Set drive train directions to motors
         leftDriveF.setDirection(DcMotor.Direction.FORWARD);
@@ -146,20 +145,21 @@ public class FT_Robot
         // TODO: For init set ground positions to lift motors positions
 
         //Initialize all servo
-        markerDrop  = hwMap.get(Servo.class, "marker_drop");
+        markerDrop = hwMap.get(Servo.class, "marker_drop");
 
         //TODO: add starting pos of ALL servos
 
     }
 
     // TODO: add ALL hwmap init to method below
-    public void initAutonomous(HardwareMap ahwMap) {}
+    public void initAutonomous(HardwareMap ahwMap) {
+    }
 
     /* Methods for all op modes*/
 
     // TODO: Correct degree variation in if statement so that it works well
-    public boolean overCrater (double currentAngle){
-        if((currentAngle > (FLAT_SOURCE + 4)) || (currentAngle < (FLAT_SOURCE - 4))){
+    public boolean overCrater(double currentAngle) {
+        if ((currentAngle > (FLAT_SOURCE + 4)) || (currentAngle < (FLAT_SOURCE - 4))) {
             cageLiftL.setTargetPosition(CRATER_LIFT);
             cageLiftR.setTargetPosition(CRATER_LIFT);
             cageLiftL.setMode(DcMotor.RunMode.RUN_TO_POSITION);
@@ -177,12 +177,25 @@ public class FT_Robot
             return false;
         }
     }
-    public boolean liftIsBusy(){
-        if (cageLiftL.isBusy() && cageLiftR.isBusy()){
+
+    public boolean liftIsBusy() {
+        if (cageLiftL.isBusy() && cageLiftR.isBusy()) {
             return true;
-        } else{
+        } else {
             return false;
         }
     }
- }
+
+    // inputs: 'a' or 'm'--> m means manual and a means automatic
+    // this setup method will be useful if there can't be 2 variables on the same motor
+    public void liftSetup(char mode) {
+        if (mode == 'a') {
+            cageLiftL.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            cageLiftR.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        } else if (mode == 'm'){
+            cageLiftL.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+            cageLiftR.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        }
+    }
+}
 
