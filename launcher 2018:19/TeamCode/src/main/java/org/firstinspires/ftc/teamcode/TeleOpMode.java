@@ -73,24 +73,28 @@ public class TeleOpMode extends OpMode
         // make reset encoders before setting pos                    // THIS SHOULD WORK IF CODE RUNS PROCEDURALLY
         // if statement that only sets pos if on extremes and NOT when busy
         // Second button tracker (if pressed) that only runs motors to position
-    if ((!robot.cageLiftL.isBusy() && !robot.cageLiftR.isBusy()) && robot.cageLiftR.getCurrentPosition() == robot.TOP_LIFT){
-        robot.cageLiftR.setTargetPosition(robot.GROUND_LIFT);
-        robot.cageLiftL.setTargetPosition(robot.GROUND_LIFT);
-    } else if ((!robot.cageLiftL.isBusy() && !robot.cageLiftR.isBusy()) && robot.cageLiftR.getCurrentPosition() == robot.GROUND_LIFT){
-        robot.cageLiftR.setTargetPosition(robot.TOP_LIFT);
-        robot.cageLiftL.setTargetPosition(robot.TOP_LIFT);
-    }
 
-    if( (!robot.cageLiftL.isBusy() && !robot.cageLiftR.isBusy()) && gamepad1.y){
-        robot.cageLiftL.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        robot.cageLiftR.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-    } else {
-        robot.cageLiftL.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        robot.cageLiftR.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+    // test of cage lift automatic controls
+    if(gamepad1.y && !robot.lastLiftB && !robot.liftIsBusy()){
+        robot.lastLiftB = true;
+        int currPos = robot.cageLiftRAuto.getCurrentPosition();
+        if(currPos == 100){
+            robot.cageLiftRAuto.setTargetPosition(0);
+            robot.cageLiftLAuto.setTargetPosition(0);
+            robot.cageLiftRAuto.setPower(0.2);
+            robot.cageLiftLAuto.setPower(0.2);
+        }else if (currPos == 0){
+            robot.cageLiftRAuto.setTargetPosition(100);
+            robot.cageLiftLAuto.setTargetPosition(100);
+            robot.cageLiftRAuto.setPower(0.2);
+            robot.cageLiftLAuto.setPower(0.2);
+        }
+    }else if (robot.lastLiftB) {
+        robot.lastLiftB = false;
     }
 
     // Automized crater lift
-//        robot.overCrater();    // TODO: Check if that is the right angle
+//        robot.overCrater();
 
     // cage intake code below
     if (gamepad2.a)

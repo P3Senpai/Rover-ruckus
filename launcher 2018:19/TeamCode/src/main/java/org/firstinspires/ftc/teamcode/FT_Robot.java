@@ -46,9 +46,10 @@ public class FT_Robot
         // Cage Lift and Intake motors
         protected DcMotor  cageLiftL    = null;
         protected DcMotor  cageLiftR    = null;
-        protected DcMotor  cageLiftLAuto = null;        // TODO: test if have two motor hwmap to the same name breaks app
-        protected DcMotor  cageLiftRAuto = null;
         protected DcMotor  cageIntake   = null;
+
+        protected DcMotor  cageLiftLAuto = null; // TODO: test if have two motor hwmap to the same name breaks app
+        protected DcMotor  cageLiftRAuto = null;
         // Robot lift motor
         protected DcMotor  roboLift     = null;
 
@@ -71,6 +72,9 @@ public class FT_Robot
         protected final int TOP_LIFT = 1000;
         protected final int GROUND_LIFT = 0;
         protected final int CRATER_LIFT = 200;
+
+        //Other values
+        protected boolean lastLiftB = false;
 
     // IMU initialized variables
     // TODO: Add functional IMU values AND check if they update automatically in the tele op mode
