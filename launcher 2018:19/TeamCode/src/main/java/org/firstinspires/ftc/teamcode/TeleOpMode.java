@@ -79,57 +79,49 @@ public class TeleOpMode extends OpMode
     // test of cage lift automatic controls
     if(gamepad1.y && !robot.lastLiftB && !robot.liftIsBusy()){
         robot.lastLiftB = true;
+        // if auto motor doesn't work then add setMode (run-to-pos) here
         int currPos = robot.cageLiftRAuto.getCurrentPosition(); // TODO: find acutal positions
         if(currPos == 100){
             robot.cageLiftRAuto.setTargetPosition(0);
             robot.cageLiftLAuto.setTargetPosition(0);
             robot.cageLiftRAuto.setPower(0.2);
             robot.cageLiftLAuto.setPower(0.2);
-        }else if (currPos == 0){
+        } else if (currPos == 0){
             robot.cageLiftRAuto.setTargetPosition(100);
             robot.cageLiftLAuto.setTargetPosition(100);
             robot.cageLiftRAuto.setPower(0.2);
             robot.cageLiftLAuto.setPower(0.2);
         }
-    }else if (robot.lastLiftB) {
+    } else if (robot.lastLiftB) {
         robot.lastLiftB = false;
     }
 
 
         // cage intake code below
-        if (gamepad2.a) {
-            robot.cageIntake.setPower(robot.INTAKE_SPEED);
-        }
-    else if (gamepad2.b) {
-            robot.cageIntake.setPower(robot.INTAKE_SPEED_OUT);
-        }
-    else {
-            robot.cageIntake.setPower(0.0);
-        }
+    if (gamepad2.a)
+        robot.cageIntake.setPower(robot.INTAKE_SPEED);
+    else if (gamepad2.b)
+        robot.cageIntake.setPower(robot.INTAKE_SPEED_OUT);
+    else
+        robot.cageIntake.setPower(0.0);
 
 
         // Robot lift controls
-        if(gamepad1.dpad_up) {
-            robot.roboLift.setPower(1.0);
-        }
-    else if(gamepad1.dpad_down) {
-            robot.roboLift.setPower(-1.0);
-        }
-    else {
-            robot.roboLift.setPower(0);
-        }
+    if(gamepad1.dpad_up)
+        robot.roboLift.setPower(1.0);
+    else if(gamepad1.dpad_down)
+        robot.roboLift.setPower(-1.0);
+    else
+        robot.roboLift.setPower(0);
 
 
-        // Marker Drop
-        if (gamepad1.a) {
-            robot.markerDrop.setPosition(0.2);
-        }
-        else if (gamepad1.b) {
-            robot.markerDrop.setPosition(0.8);
-        }
-        else{
-            robot.markerDrop.setPosition(0.5);
-        }
+        // Marker Drop only test for autonomous
+    if (gamepad1.a)
+        robot.markerDrop.setPosition(0.2);
+    else if (gamepad1.b)
+        robot.markerDrop.setPosition(0.8);
+    else
+        robot.markerDrop.setPosition(0.5);
 
         // Automized crater lift
 //        robot.overCrater();
