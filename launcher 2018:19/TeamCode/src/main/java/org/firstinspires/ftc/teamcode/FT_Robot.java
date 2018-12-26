@@ -66,7 +66,7 @@ public class FT_Robot
     /* Preset Values */
         // Intake speeds
         protected final static double INTAKE_SPEED = 1.0;
-        protected final static double INTAKE_SPEED_OUT = -1.0;
+        protected final static double INTAKE_SPEED_OUT = -0.4;
 
         // Lifting position         // TODO: Check all of the encoder numbers
         protected final int TOP_LIFT = 1000;

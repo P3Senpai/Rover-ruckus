@@ -68,6 +68,8 @@ public class TeleOpMode extends OpMode
         double rightLiftPow = Range.clip(gamepad2.right_stick_y, -1.0, 1.0);
         robot.cageLiftL.setPower(leftLiftPow * 0.5);
         robot.cageLiftR.setPower(rightLiftPow * 0.5);
+        //TODO: test how automatic lifting and manual lifting work in unison
+
 
     // Automized lifting
         // make reset encoders before setting pos                    // THIS SHOULD WORK IF CODE RUNS PROCEDURALLY
@@ -77,7 +79,7 @@ public class TeleOpMode extends OpMode
     // test of cage lift automatic controls
     if(gamepad1.y && !robot.lastLiftB && !robot.liftIsBusy()){
         robot.lastLiftB = true;
-        int currPos = robot.cageLiftRAuto.getCurrentPosition();
+        int currPos = robot.cageLiftRAuto.getCurrentPosition(); // TODO: find acutal positions
         if(currPos == 100){
             robot.cageLiftRAuto.setTargetPosition(0);
             robot.cageLiftLAuto.setTargetPosition(0);
@@ -93,35 +95,44 @@ public class TeleOpMode extends OpMode
         robot.lastLiftB = false;
     }
 
-    // Automized crater lift
-//        robot.overCrater();
 
-    // cage intake code below
-    if (gamepad2.a)
-        robot.cageIntake.setPower(robot.INTAKE_SPEED);
-    else if (gamepad2.b)
-        robot.cageIntake.setPower(robot.INTAKE_SPEED_OUT);
-    else
-        robot.cageIntake.setPower(0.0);
+        // cage intake code below
+        if (gamepad2.a) {
+            robot.cageIntake.setPower(robot.INTAKE_SPEED);
+        }
+    else if (gamepad2.b) {
+            robot.cageIntake.setPower(robot.INTAKE_SPEED_OUT);
+        }
+    else {
+            robot.cageIntake.setPower(0.0);
+        }
 
 
-    // Robot lift controls
-    if(gamepad1.dpad_up)
-        robot.roboLift.setPower(1.0);
-    else if(gamepad1.dpad_down)
-        robot.roboLift.setPower(-1.0);
-    else
-        robot.roboLift.setPower(0);
+        // Robot lift controls
+        if(gamepad1.dpad_up) {
+            robot.roboLift.setPower(1.0);
+        }
+    else if(gamepad1.dpad_down) {
+            robot.roboLift.setPower(-1.0);
+        }
+    else {
+            robot.roboLift.setPower(0);
+        }
 
 
         // Marker Drop
-        if (gamepad1.a)
-            robot.markerDrop.setPosition(0.2);  //TODO: make the servo a standard servo and NOT continuous
-        else if (gamepad1.b)
+        if (gamepad1.a) {
+            robot.markerDrop.setPosition(0.2);
+        }
+        else if (gamepad1.b) {
             robot.markerDrop.setPosition(0.8);
+        }
         else{
             robot.markerDrop.setPosition(0.5);
         }
+
+        // Automized crater lift
+//        robot.overCrater();
 
         // Show the elapsed game time and wheel power.
         telemetry.addData("Status", "Run Time: " + runtime.toString());
