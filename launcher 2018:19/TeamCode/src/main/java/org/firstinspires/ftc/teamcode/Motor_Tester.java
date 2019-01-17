@@ -5,7 +5,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
-@TeleOp(name="Juju", group="Iterative Opmode")
+@TeleOp(name="Lift test", group="Iterative Opmode")
 //@Disabled
 
 public class Motor_Tester extends OpMode
@@ -14,7 +14,6 @@ public class Motor_Tester extends OpMode
     private ElapsedTime runtime = new ElapsedTime();
     private FT_Robot robot =  new FT_Robot();
     double val = 0;
-
      /*
      * Code to run ONCE when the driver hits INIT
      */
@@ -45,13 +44,14 @@ public class Motor_Tester extends OpMode
     @Override
     public void loop() {
 
-    if (gamepad1.dpad_up)
+    if (gamepad1.dpad_up && val <= 1) {
         val += 0.005;
-    else if(gamepad1.dpad_down)
+    } else if (gamepad1.dpad_down && val >= -1) {
         val -= 0.005;
+    }
     if (gamepad1.a){
-        robot.cageLiftR.setPower(val);
         robot.cageLiftL.setPower(val);
+        robot.cageLiftR.setPower(val);
     }else{
         robot.cageLiftR.setPower(0);
         robot.cageLiftL.setPower(0);
@@ -61,7 +61,8 @@ public class Motor_Tester extends OpMode
 
     // Show the elapsed game time and wheel power.
     telemetry.addData("Status", "Run Time: " + runtime.toString());
-    telemetry.addData("Motors", "SPEED(%.3f)", val);
+    telemetry.addData("Motors", "SPEED (%.3f)", val);
+        telemetry.addData("Motors", "yeetL (%.3f), yeetR (%.2f)", robot.cageLiftL.getPower(), robot.cageLiftR.getPower());
     telemetry.update();
     }
 
