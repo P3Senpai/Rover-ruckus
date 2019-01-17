@@ -106,6 +106,8 @@ public class FT_Robot {
         // TODO: check if setting 2 different motors to 1 hwmap works
         cageLiftLAuto = hwMap.get(DcMotor.class, "cage_lift_l");
         cageLiftRAuto = hwMap.get(DcMotor.class, "cage_lift_r");
+        cageLiftL.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        cageLiftR.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         // Robot lifting
         roboLift = hwMap.get(DcMotor.class, "robo_lift");
         // Cage intake
