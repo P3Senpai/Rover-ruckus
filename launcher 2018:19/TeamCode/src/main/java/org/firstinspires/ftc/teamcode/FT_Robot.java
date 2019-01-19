@@ -46,9 +46,6 @@ public class FT_Robot {
     protected DcMotor cageLiftL = null;
     protected DcMotor cageLiftR = null;
     protected DcMotor cageIntake = null;
-
-    protected DcMotor cageLiftLAuto = null; // TODO: test if have two motor hwmap to the same name breaks app
-    protected DcMotor cageLiftRAuto = null;
     // Robot lift motor
     protected DcMotor roboLift = null;
 
@@ -104,8 +101,6 @@ public class FT_Robot {
         cageLiftR = hwMap.get(DcMotor.class, "cage_lift_r");
 
         // TODO: check if setting 2 different motors to 1 hwmap works
-        cageLiftLAuto = hwMap.get(DcMotor.class, "cage_lift_l");
-        cageLiftRAuto = hwMap.get(DcMotor.class, "cage_lift_r");
         cageLiftL.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         cageLiftR.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         // Robot lifting
@@ -137,12 +132,6 @@ public class FT_Robot {
         // Cage lift manual controls init
         cageLiftL.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         cageLiftR.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-
-        // Auto encoders control
-        cageLiftLAuto.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        cageLiftRAuto.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        cageLiftLAuto.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        cageLiftRAuto.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
         // TODO: For init set ground positions to lift motors positions
 

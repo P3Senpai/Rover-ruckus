@@ -62,7 +62,7 @@ public class Motor_Tester extends OpMode
     // Show the elapsed game time and wheel power.
     telemetry.addData("Status", "Run Time: " + runtime.toString());
     telemetry.addData("Motors", "SPEED (%.3f)", val);
-        telemetry.addData("Motors", "yeetL (%.3f), yeetR (%.3f)", robot.cageLiftL.getPower(), robot.cageLiftR.getPower());
+        telemetry.addData("Motors", "yeetR (%.3f)", robot.cageLiftR.getPower());
     telemetry.update();
     }
 
