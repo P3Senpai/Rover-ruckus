@@ -48,7 +48,9 @@ public class TeleOpMode extends OpMode
      */
     @Override
     public void loop() {
-
+    double heading = robot.imu.getAngularOrientation().firstAngle;
+    double roll  = robot.imu.getAngularOrientation().secondAngle;
+    double pitch = robot.imu.getAngularOrientation().thirdAngle;
 
     // Set up driving so that robot can be controlled with 1 joystick (gp1, left)
     double drive  = -gamepad1.left_stick_y;
@@ -130,6 +132,7 @@ public class TeleOpMode extends OpMode
         telemetry.addData("Status", "Run Time: " + runtime.toString());
         telemetry.addData("Motors", "left (%.2f), right (%.2f)", leftPower, rightPower);
         telemetry.addData("Servo", "(%.2f)", robot.markerDrop.getPosition());
+        telemetry.addData("Hey", "heading(z) (%.2f), roll(x) (%.2f), pitch(y) (%.2f)", heading, roll, pitch);
         telemetry.update();
     }
 
