@@ -62,7 +62,7 @@ public class Motor_Tester extends OpMode
     // Show the elapsed game time and wheel power.
     telemetry.addData("Status", "Run Time: " + runtime.toString());
     telemetry.addData("Motors", "SPEED (%.3f)", val);
-        telemetry.addData("Motors", "yeetR (%.3f)", robot.cageLiftR.getPower());
+        telemetry.addData("Motors", "yeetR (%.3f), yeetL (%.3f)", robot.cageLiftR.getPower(), robot.cageLiftL.getPower());
     telemetry.update();
     }
 
@@ -71,24 +71,5 @@ public class Motor_Tester extends OpMode
      */
     @Override
     public void stop() {
-    }
-
-    /*  TODO: find value ranges
-     * gets rgb colour values and returns: White, Yellow, Black
-     *  TODO: should i incorporate alpha() values ????????????????????
-     */
-    private String rgbValueCalc(int rawBlue, int rawGreen, int rawRed){
-        double scaleFactor = 255;
-        int cleanBlue = (int) (rawBlue * scaleFactor);
-        int cleanGreen = (int) (rawGreen * scaleFactor);
-        int cleanRed = (int) (rawRed * scaleFactor);
-
-//          TODO: find value ranges
-//        if (/*yellow*/){
-//            return "Yellow";
-//            } //else if (){
-//            return "White";
-//       }
-            return "Nothing";
     }
 }

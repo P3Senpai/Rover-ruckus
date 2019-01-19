@@ -49,8 +49,6 @@ public class FT_Robot {
     // Robot lift motor
     protected DcMotor roboLift = null;
 
-    protected VoltageSensor volts = null;
-
     /* Servos */
     protected Servo markerDrop = null;
 
@@ -99,8 +97,6 @@ public class FT_Robot {
         // Cage Lift
         cageLiftL = hwMap.get(DcMotor.class, "cage_lift_l");
         cageLiftR = hwMap.get(DcMotor.class, "cage_lift_r");
-
-        // TODO: check if setting 2 different motors to 1 hwmap works
         cageLiftL.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         cageLiftR.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         // Robot lifting
@@ -114,7 +110,7 @@ public class FT_Robot {
         leftDriveB.setDirection(DcMotor.Direction.FORWARD);
         rightDriveB.setDirection(DcMotor.Direction.REVERSE);
 
-        // todo: Check if direction set for cage lift motors is necessary
+        // Cage lift Directions
         cageLiftL.setDirection(DcMotor.Direction.FORWARD);
         cageLiftR.setDirection(DcMotor.Direction.REVERSE);
 
@@ -139,7 +135,7 @@ public class FT_Robot {
         markerDrop = hwMap.get(Servo.class, "marker_drop");
 
         //TODO: add starting pos of ALL servos
-
+        markerDrop.setPosition(0.5);
     }
 
     // TODO: add ALL hwmap init to method below
@@ -149,27 +145,27 @@ public class FT_Robot {
     /* Methods for all op modes*/
 
     // TODO: Correct degree variation in if statement so that it works well
-    public boolean overCrater(double currentAngle) {
-        if ((currentAngle > (FLAT_SOURCE + 4)) || (currentAngle < (FLAT_SOURCE - 4))) {
-            cageLiftL.setTargetPosition(CRATER_LIFT);
-            cageLiftR.setTargetPosition(CRATER_LIFT);
-            cageLiftL.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            cageLiftR.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            cageLiftL.setPower(0.2);
-            cageLiftR.setPower(0.2);
-            return true;
-        } else {
-            cageLiftL.setTargetPosition(GROUND_LIFT);
-            cageLiftR.setTargetPosition(GROUND_LIFT);
-            cageLiftL.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            cageLiftR.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            cageLiftL.setPower(0.2);
-            cageLiftR.setPower(0.2);
-            return false;
-        }
-    }
+//    public boolean overCrater(double currentAngle) {
+//        if ((currentAngle > (FLAT_SOURCE + 4)) || (currentAngle < (FLAT_SOURCE - 4))) {
+//            cageLiftL.setTargetPosition(CRATER_LIFT);
+//            cageLiftR.setTargetPosition(CRATER_LIFT);
+//            cageLiftL.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+//            cageLiftR.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+//            cageLiftL.setPower(0.2);
+//            cageLiftR.setPower(0.2);
+//            return true;
+//        } else {
+//            cageLiftL.setTargetPosition(GROUND_LIFT);
+//            cageLiftR.setTargetPosition(GROUND_LIFT);
+//            cageLiftL.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+//            cageLiftR.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+//            cageLiftL.setPower(0.2);
+//            cageLiftR.setPower(0.2);
+//            return false;
+//        }
+//    }
 
-    public boolean liftIsBusy() {
+    protected boolean liftIsBusy() {
         if (cageLiftL.isBusy() && cageLiftR.isBusy()) {
             return true;
         } else {
@@ -179,7 +175,7 @@ public class FT_Robot {
 
     // inputs: 'a' or 'm'--> m means manual and a means automatic
     // this setup method will be useful if there can't be 2 variables on the same motor
-    public void liftSetup(char mode) {
+    protected void liftSetup(char mode) {
         if (mode == 'a') {
             cageLiftL.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             cageLiftR.setMode(DcMotor.RunMode.RUN_TO_POSITION);

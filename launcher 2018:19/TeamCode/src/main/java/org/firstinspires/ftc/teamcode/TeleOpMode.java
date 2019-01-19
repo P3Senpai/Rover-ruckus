@@ -72,28 +72,27 @@ public class TeleOpMode extends OpMode
 
 
     // Automized lifting
-        // make reset encoders before setting pos                    // THIS SHOULD WORK IF CODE RUNS PROCEDURALLY
-        // if statement that only sets pos if on extremes and NOT when busy
-        // Second button tracker (if pressed) that only runs motors to position
-
-    // test of cage lift automatic controls
     if(gamepad1.y && !robot.lastLiftB && !robot.liftIsBusy()){
         robot.lastLiftB = true;
-        // if auto motor doesn't work then add setMode (run-to-pos) here
-        int currPos = robot.cageLiftRAuto.getCurrentPosition(); // TODO: find acutal positions
-        if(currPos == 100){
-            robot.cageLiftRAuto.setTargetPosition(0);
-            robot.cageLiftLAuto.setTargetPosition(0);
-            robot.cageLiftRAuto.setPower(0.2);
-            robot.cageLiftLAuto.setPower(0.2);
-        } else if (currPos == 0){
-            robot.cageLiftRAuto.setTargetPosition(100);
-            robot.cageLiftLAuto.setTargetPosition(100);
-            robot.cageLiftRAuto.setPower(0.2);
-            robot.cageLiftLAuto.setPower(0.2);
+        robot.liftSetup('a');
+
+        int currPosL = robot.cageLiftL.getCurrentPosition();
+        int currPosR = robot.cageLiftR.getCurrentPosition();
+
+        if(currPosL == 100 && currPosR == 100){  // TODO: find acutal positions
+            robot.cageLiftR.setTargetPosition(100);
+            robot.cageLiftL.setTargetPosition(100);
+            robot.cageLiftR.setPower(0.35);
+            robot.cageLiftL.setPower(0.35);
+        } else if (currPosL == 0 && currPosR == 0){ // TODO: find acutal positions
+            robot.cageLiftR.setTargetPosition(0);
+            robot.cageLiftL.setTargetPosition(0);
+            robot.cageLiftR.setPower(0.35);
+            robot.cageLiftL.setPower(0.35);
         }
     } else if (robot.lastLiftB) {
         robot.lastLiftB = false;
+        robot.liftSetup('m');
     }
 
 
@@ -116,12 +115,13 @@ public class TeleOpMode extends OpMode
 
 
         // Marker Drop only test for autonomous
+        double pos = robot.markerDrop.getPosition();
     if (gamepad1.a)
-        robot.markerDrop.setPosition(0.2);
+        robot.markerDrop.setPosition(pos+ 0.05);
     else if (gamepad1.b)
-        robot.markerDrop.setPosition(0.8);
+        robot.markerDrop.setPosition(pos- 0.05);
     else
-        robot.markerDrop.setPosition(0.5);
+        robot.markerDrop.setPosition(0);
 
         // Automized crater lift
 //        robot.overCrater();
@@ -129,6 +129,7 @@ public class TeleOpMode extends OpMode
         // Show the elapsed game time and wheel power.
         telemetry.addData("Status", "Run Time: " + runtime.toString());
         telemetry.addData("Motors", "left (%.2f), right (%.2f)", leftPower, rightPower);
+        telemetry.addData("Servo", "(%.2f)", robot.markerDrop.getPosition());
         telemetry.update();
     }
 
