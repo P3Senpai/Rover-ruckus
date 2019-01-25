@@ -147,17 +147,20 @@ public class FT_Robot {
         // Cage lift manual controls init
 //        cageLiftL.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 //        cageLiftR.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        // TODO: Test out encoder lifting
+        // TODO: Check if reseting encoders is necessary/ good idea
         cageLiftL.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         cageLiftR.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
-        // TODO: For init set ground positions to lift motors positions
-
         //Initialize all servo
         markerDrop = hwMap.get(Servo.class, "marker_drop");
+        colorMove = hwMap.get(Servo.class, "color_move");
 
         //TODO: add starting pos of ALL servos
         markerDrop.setPosition(0.5);
+        colorMove.setPosition(0.5);
+
+        // Sensors
+        color = hwMap.get(ColorSensor.class, "color_sensor");
 
     // imu init
         // Set up the parameters with which we will use our IMU. Note that integration

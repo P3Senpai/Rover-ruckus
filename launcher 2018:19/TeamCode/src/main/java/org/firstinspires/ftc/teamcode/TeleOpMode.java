@@ -48,10 +48,8 @@ public class TeleOpMode extends OpMode
      */
     @Override
     public void loop() {
-    double heading = robot.imu.getAngularOrientation().firstAngle;
-    double roll  = robot.imu.getAngularOrientation().secondAngle;
-    double pitch = robot.imu.getAngularOrientation().thirdAngle;
 
+    // region driving
     // Set up driving so that robot can be controlled with 1 joystick (gp1, left)
     double drive  = -gamepad1.left_stick_y;
     double turn   =  gamepad1.left_stick_x;
@@ -59,28 +57,31 @@ public class TeleOpMode extends OpMode
     double rightPower   = Range.clip(drive + turn, -1.0, 1.0) ;
 
         //Left Drive Power
-    robot.leftDriveF.setPower(leftPower);    // TODO: Check if the back left motor isn't slower than the others
+    robot.leftDriveF.setPower(leftPower);
     robot.leftDriveB.setPower(leftPower);
         // Right Drive power
     robot.rightDriveF.setPower(rightPower);
     robot.rightDriveB.setPower(rightPower);
+    // endregion
 
     // Manual lift code below
-        double leftLiftPow  = Range.clip(gamepad2.left_stick_y, -1.0, 1.0);
-        double rightLiftPow = Range.clip(gamepad2.right_stick_y, -1.0, 1.0);
-        robot.cageLiftL.setPower(leftLiftPow * robot.LIFT_POWER_CAP);
-        robot.cageLiftR.setPower(rightLiftPow * robot.LIFT_POWER_CAP );
-        //TODO: test how automatic lifting and manual lifting work in unison
+        double liftPower  = Range.clip(gamepad2.left_stick_y, -1.0, 1.0);
+        robot.cageLiftL.setPower(liftPower * robot.LIFT_POWER_CAP);
+        robot.cageLiftR.setPower(liftPower * robot.LIFT_POWER_CAP );
+        if(gamepad2.left_stick_button){
+            manualToAuto(liftPower);
+        }
 
 
-    // Automized lifting
+    // Automatized lifting
     if(gamepad1.y && !robot.lastLiftB && !robot.liftIsBusy()){
-        robot.lastLiftB = true;
-        robot.liftSetup('a');
-
+        // local values
         int currPosL = robot.cageLiftL.getCurrentPosition();
         int currPosR = robot.cageLiftR.getCurrentPosition();
-
+        // Change toggle state
+        robot.lastLiftB = true;
+        // Set up automatized values
+        robot.liftSetup('a');
         if(currPosL == 900 && currPosR == 900){  // TODO: find acutal positions
             robot.cageLiftR.setTargetPosition(0);
             robot.cageLiftL.setTargetPosition(0);
@@ -94,20 +95,23 @@ public class TeleOpMode extends OpMode
         }
     } else if (robot.lastLiftB) {
         robot.lastLiftB = false;
+    }
+    // changing to manual when lift isn't working
+    if(!robot.liftIsBusy()){
         robot.liftSetup('m');
     }
 
-
-        // cage intake code below
+    // region cage intake
+        // cage intake code below  // TODO: remap buttons to driver preferences
     if (gamepad2.a)
         robot.cageIntake.setPower(robot.INTAKE_SPEED);
     else if (gamepad2.b)
         robot.cageIntake.setPower(robot.INTAKE_SPEED_OUT);
     else
         robot.cageIntake.setPower(0.0);
+    // endregion
 
-
-        // Robot lift controls
+        // Robot lift controls  TODO: Make lifting limits to stop the rail from breaking
     if(gamepad1.dpad_up)
         robot.roboLift.setPower(1.0);
     else if(gamepad1.dpad_down)
@@ -115,7 +119,8 @@ public class TeleOpMode extends OpMode
     else
         robot.roboLift.setPower(0);
 
-
+    //TODO: move to autonomous op mode
+    // region marker drop
         // Marker Drop only test for autonomous
         double pos = robot.markerDrop.getPosition();
     if (gamepad1.a)
@@ -124,8 +129,13 @@ public class TeleOpMode extends OpMode
         robot.markerDrop.setPosition(pos- 0.05);
     else
         robot.markerDrop.setPosition(0);
+    // endregion
 
         // Automized crater lift
+        // imu values
+        double heading = robot.imu.getAngularOrientation().firstAngle;
+        double roll  = robot.imu.getAngularOrientation().secondAngle;
+        double pitch = robot.imu.getAngularOrientation().thirdAngle;
 //        robot.overCrater();
 
         // Show the elapsed game time and wheel power.
@@ -134,7 +144,7 @@ public class TeleOpMode extends OpMode
         telemetry.addData("Motor Pos", "left %d, right %d", robot.cageLiftL.getCurrentPosition(), robot.cageLiftR.getCurrentPosition());
         telemetry.addData("ROBOT LIFT POS:", "%d", robot.roboLift.getCurrentPosition());
         telemetry.addData("Servo", "(%.2f)", robot.markerDrop.getPosition());
-        telemetry.addData("Hey", "heading(z) (%.2f), roll(x) (%.2f), pitch(y) (%.2f)", heading, roll, pitch);
+        telemetry.addData("IMU: ", "heading(z) (%.2f), roll(x) (%.2f), pitch(y) (%.2f)", heading, roll, pitch);
         telemetry.update();
     }
 
@@ -166,6 +176,9 @@ public class TeleOpMode extends OpMode
 
     // TODO: Change manual nums to variables
     private void manualToAuto(double direction){
+        // Set automatic lift set run mode
+        robot.liftSetup('a');
+        // Deciding where to clip lifts
         if (direction >= (0.3 * robot.LIFT_POWER_CAP)){
             robot.cageLiftL.setTargetPosition(900);
             robot.cageLiftR.setTargetPosition(900);
