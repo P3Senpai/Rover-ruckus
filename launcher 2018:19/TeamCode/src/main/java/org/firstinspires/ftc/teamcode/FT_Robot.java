@@ -31,7 +31,9 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
+import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.VoltageSensor;
@@ -56,10 +58,11 @@ public class FT_Robot {
 
     /* Servos */
     protected Servo markerDrop = null;
+    protected Servo colorMove = null;
 
     /* Sensors */
     protected SensorIMU imuSensor = null;
-
+    protected ColorSensor color = null;
 
     /* Preset Values */
     // Intake speeds
@@ -70,6 +73,10 @@ public class FT_Robot {
     protected final int TOP_LIFT = 1000;
     protected final int GROUND_LIFT = 0;
     protected final int CRATER_LIFT = 200;
+    // add ground and top position for the robot lift
+    protected final double LIFT_POWER_CAP = 0.4;
+    protected final double UP_LIFT_SPEED = 0.45;
+    protected final double DOWN_LIFT_SPEED = 0.15;
 
     //Toggle Values
     protected boolean lastLiftB = false;
@@ -118,8 +125,13 @@ public class FT_Robot {
         rightDriveB.setDirection(DcMotor.Direction.REVERSE);
 
         // Cage lift Directions
-        cageLiftL.setDirection(DcMotor.Direction.FORWARD);
-        cageLiftR.setDirection(DcMotor.Direction.REVERSE);
+        cageLiftL.setDirection(DcMotor.Direction.REVERSE);
+        cageLiftR.setDirection(DcMotor.Direction.FORWARD);
+
+        // Robot lift direction
+        roboLift.setDirection(DcMotorSimple.Direction.FORWARD);
+        roboLift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        roboLift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
 
         // Set all motors to zero power
@@ -133,8 +145,11 @@ public class FT_Robot {
         cageIntake.setPower(0);
 
         // Cage lift manual controls init
-        cageLiftL.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        cageLiftR.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+//        cageLiftL.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+//        cageLiftR.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        // TODO: Test out encoder lifting
+        cageLiftL.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        cageLiftR.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
         // TODO: For init set ground positions to lift motors positions
 

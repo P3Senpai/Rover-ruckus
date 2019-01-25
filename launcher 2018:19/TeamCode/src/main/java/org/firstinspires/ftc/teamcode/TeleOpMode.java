@@ -68,8 +68,8 @@ public class TeleOpMode extends OpMode
     // Manual lift code below
         double leftLiftPow  = Range.clip(gamepad2.left_stick_y, -1.0, 1.0);
         double rightLiftPow = Range.clip(gamepad2.right_stick_y, -1.0, 1.0);
-        robot.cageLiftL.setPower(leftLiftPow * 0.5);
-        robot.cageLiftR.setPower(rightLiftPow * 0.5);
+        robot.cageLiftL.setPower(leftLiftPow * robot.LIFT_POWER_CAP);
+        robot.cageLiftR.setPower(rightLiftPow * robot.LIFT_POWER_CAP );
         //TODO: test how automatic lifting and manual lifting work in unison
 
 
@@ -81,16 +81,16 @@ public class TeleOpMode extends OpMode
         int currPosL = robot.cageLiftL.getCurrentPosition();
         int currPosR = robot.cageLiftR.getCurrentPosition();
 
-        if(currPosL == 100 && currPosR == 100){  // TODO: find acutal positions
-            robot.cageLiftR.setTargetPosition(100);
-            robot.cageLiftL.setTargetPosition(100);
-            robot.cageLiftR.setPower(0.35);
-            robot.cageLiftL.setPower(0.35);
-        } else if (currPosL == 0 && currPosR == 0){ // TODO: find acutal positions
+        if(currPosL == 900 && currPosR == 900){  // TODO: find acutal positions
             robot.cageLiftR.setTargetPosition(0);
             robot.cageLiftL.setTargetPosition(0);
-            robot.cageLiftR.setPower(0.35);
-            robot.cageLiftL.setPower(0.35);
+            robot.cageLiftR.setPower(0.15);
+            robot.cageLiftL.setPower(0.15);
+        } else if (currPosL == 0 && currPosR == 0){ // TODO: find acutal positions
+            robot.cageLiftR.setTargetPosition(900);
+            robot.cageLiftL.setTargetPosition(900);
+            robot.cageLiftR.setPower(0.45);
+            robot.cageLiftL.setPower(0.45);
         }
     } else if (robot.lastLiftB) {
         robot.lastLiftB = false;
@@ -131,6 +131,8 @@ public class TeleOpMode extends OpMode
         // Show the elapsed game time and wheel power.
         telemetry.addData("Status", "Run Time: " + runtime.toString());
         telemetry.addData("Motors", "left (%.2f), right (%.2f)", leftPower, rightPower);
+        telemetry.addData("Motor Pos", "left %d, right %d", robot.cageLiftL.getCurrentPosition(), robot.cageLiftR.getCurrentPosition());
+        telemetry.addData("ROBOT LIFT POS:", "%d", robot.roboLift.getCurrentPosition());
         telemetry.addData("Servo", "(%.2f)", robot.markerDrop.getPosition());
         telemetry.addData("Hey", "heading(z) (%.2f), roll(x) (%.2f), pitch(y) (%.2f)", heading, roll, pitch);
         telemetry.update();
@@ -160,5 +162,20 @@ public class TeleOpMode extends OpMode
 //            return "White";
 //       }
             return "Nothing";
+    }
+
+    // TODO: Change manual nums to variables
+    private void manualToAuto(double direction){
+        if (direction >= (0.3 * robot.LIFT_POWER_CAP)){
+            robot.cageLiftL.setTargetPosition(900);
+            robot.cageLiftR.setTargetPosition(900);
+            robot.cageLiftL.setPower(0.45);
+            robot.cageLiftR.setPower(0.45);
+        } else if (direction <= (-0.3 * robot.LIFT_POWER_CAP)){
+            robot.cageLiftL.setTargetPosition(0);
+            robot.cageLiftR.setTargetPosition(0);
+            robot.cageLiftL.setPower(0.15);
+            robot.cageLiftR.setPower(0.15);
+        }
     }
 }
