@@ -59,6 +59,7 @@ public class FT_Robot {
     /* Servos */
     protected Servo markerDrop = null;
     protected Servo colorMove = null;
+    protected Servo liftRelease = null;
 
     /* Sensors */
     protected SensorIMU imuSensor = null;
@@ -154,13 +155,15 @@ public class FT_Robot {
         //Initialize all servo
         markerDrop = hwMap.get(Servo.class, "marker_drop");
         colorMove = hwMap.get(Servo.class, "color_move");
+        liftRelease = hwMap.get(Servo.class, "lift_release");
 
         //TODO: add starting pos of ALL servos
         markerDrop.setPosition(0.5);
         colorMove.setPosition(0.5);
+        liftRelease.setPosition(0.5);
 
         // Sensors
-        color = hwMap.get(ColorSensor.class, "color_sensor");
+//        color = hwMap.get(ColorSensor.class, "color_sensor");
 
     // imu init
         // Set up the parameters with which we will use our IMU. Note that integration

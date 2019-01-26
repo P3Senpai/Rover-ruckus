@@ -74,7 +74,7 @@ public class TeleOpMode extends OpMode
 
 
     // Automatized lifting
-    if(gamepad1.y && !robot.lastLiftB && !robot.liftIsBusy()){
+    if(gamepad2.a && !robot.lastLiftB && !robot.liftIsBusy()){
         // local values
         int currPosL = robot.cageLiftL.getCurrentPosition();
         int currPosR = robot.cageLiftR.getCurrentPosition();
@@ -112,9 +112,9 @@ public class TeleOpMode extends OpMode
     // endregion
 
         // Robot lift controls  TODO: Make lifting limits to stop the rail from breaking
-    if(gamepad1.dpad_up)
+    if(gamepad2.dpad_up)
         robot.roboLift.setPower(1.0);
-    else if(gamepad1.dpad_down)
+    else if(gamepad2.dpad_down)
         robot.roboLift.setPower(-1.0);
     else
         robot.roboLift.setPower(0);
@@ -130,6 +130,22 @@ public class TeleOpMode extends OpMode
     else
         robot.markerDrop.setPosition(0);
     // endregion
+
+        // region color move
+        double colorS = robot.colorMove.getPosition();
+        if (gamepad1.x)
+            robot.colorMove.setPosition(colorS+ 0.05);
+        else if (gamepad1.y)
+            robot.colorMove.setPosition(colorS- 0.05);
+        // endregion
+
+        // region color move
+        double releaseS = robot.liftRelease.getPosition();
+        if (gamepad2.x)
+            robot.liftRelease.setPosition(colorS+ 0.05);
+        else if (gamepad2.y)
+            robot.liftRelease.setPosition(colorS- 0.05);
+        // endregion
 
         // Automized crater lift
         // imu values
@@ -175,6 +191,7 @@ public class TeleOpMode extends OpMode
     }
 
     // TODO: Change manual nums to variables
+
     private void manualToAuto(double direction){
         // Set automatic lift set run mode
         robot.liftSetup('a');
