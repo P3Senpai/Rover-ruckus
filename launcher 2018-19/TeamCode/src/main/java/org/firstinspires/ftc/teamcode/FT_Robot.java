@@ -67,14 +67,14 @@ public class FT_Robot {
 
     /* Preset Values */
     // Intake speeds
-    protected final static double INTAKE_SPEED = 1.0;
-    protected final static double INTAKE_SPEED_OUT = -0.4;
+    protected final double INTAKE_SPEED = 1.0;
+    protected final double INTAKE_SPEED_OUT = -0.4;
 
     // Lifting position         // TODO: Check all of the encoder numbers
     protected final int TOP_LIFT = 1000;
     protected final int GROUND_LIFT = 0;
     protected final int CRATER_LIFT = 200;
-    // add ground and top position for the robot lift
+    // add ground and top position for the robo lift
     protected final double LIFT_POWER_CAP = 0.4;
     protected final double UP_LIFT_SPEED = 0.45;
     protected final double DOWN_LIFT_SPEED = 0.15;
@@ -114,6 +114,7 @@ public class FT_Robot {
         cageLiftR = hwMap.get(DcMotor.class, "cage_lift_r");
         cageLiftL.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         cageLiftR.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
         // Robot lifting
         roboLift = hwMap.get(DcMotor.class, "robo_lift");
         // Cage intake
@@ -121,8 +122,8 @@ public class FT_Robot {
 
         // Set drive train directions to motors
         leftDriveF.setDirection(DcMotor.Direction.FORWARD);
+        leftDriveB.setDirection(DcMotor.Direction.FORWARD); // TODO: Test if
         rightDriveF.setDirection(DcMotor.Direction.REVERSE);
-        leftDriveB.setDirection(DcMotor.Direction.FORWARD);
         rightDriveB.setDirection(DcMotor.Direction.REVERSE);
 
         // Cage lift Directions
@@ -131,8 +132,8 @@ public class FT_Robot {
 
         // Robot lift direction
         roboLift.setDirection(DcMotorSimple.Direction.FORWARD);
-        roboLift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        roboLift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+//        roboLift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        roboLift.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
 
         // Set all motors to zero power
@@ -159,8 +160,8 @@ public class FT_Robot {
 
         //TODO: add starting pos of ALL servos
         markerDrop.setPosition(0.5);
-        colorMove.setPosition(0.5);
-        liftRelease.setPosition(0.5);
+        colorMove.setPosition(0.5); // other pos is (0.0)
+        liftRelease.setPosition(0.8); // Other pos is (0.2)
 
         // Sensors
 //        color = hwMap.get(ColorSensor.class, "color_sensor");

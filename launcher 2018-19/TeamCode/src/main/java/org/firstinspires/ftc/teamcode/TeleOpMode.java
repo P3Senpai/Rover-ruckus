@@ -57,10 +57,10 @@ public class TeleOpMode extends OpMode
     double rightPower   = Range.clip(drive + turn, -1.0, 1.0) ;
 
         //Left Drive Power
-    robot.leftDriveF.setPower(leftPower);
+    robot.leftDriveF.setPower(leftPower * -1);
     robot.leftDriveB.setPower(leftPower);
         // Right Drive power
-    robot.rightDriveF.setPower(rightPower);
+    robot.rightDriveF.setPower(rightPower * -1);
     robot.rightDriveB.setPower(rightPower);
     // endregion
 
@@ -112,10 +112,12 @@ public class TeleOpMode extends OpMode
     // endregion
 
         // Robot lift controls  TODO: Make lifting limits to stop the rail from breaking
-    if(gamepad2.dpad_up)
+    if(gamepad2.dpad_up) {
         robot.roboLift.setPower(1.0);
-    else if(gamepad2.dpad_down)
+    }
+    else if(gamepad2.dpad_down){
         robot.roboLift.setPower(-1.0);
+    }
     else
         robot.roboLift.setPower(0);
 
@@ -127,24 +129,27 @@ public class TeleOpMode extends OpMode
         robot.markerDrop.setPosition(pos+ 0.05);
     else if (gamepad1.b)
         robot.markerDrop.setPosition(pos- 0.05);
-    else
-        robot.markerDrop.setPosition(0);
+
     // endregion
 
         // region color move
         double colorS = robot.colorMove.getPosition();
         if (gamepad1.x)
-            robot.colorMove.setPosition(colorS+ 0.05);
+//            robot.colorMove.setPosition(colorS + 0.05);
+            robot.colorMove.setPosition(0.0);
         else if (gamepad1.y)
-            robot.colorMove.setPosition(colorS- 0.05);
+//            robot.colorMove.setPosition(colorS - 0.05);
+            robot.colorMove.setPosition(0.5);
         // endregion
 
         // region color move
         double releaseS = robot.liftRelease.getPosition();
         if (gamepad2.x)
-            robot.liftRelease.setPosition(colorS+ 0.05);
+//            robot.liftRelease.setPosition(releaseS + 0.05);
+            robot.liftRelease.setPosition(0.2);
         else if (gamepad2.y)
-            robot.liftRelease.setPosition(colorS- 0.05);
+//            robot.liftRelease.setPosition(releaseS - 0.05);
+            robot.liftRelease.setPosition(0.8);
         // endregion
 
         // Automized crater lift
@@ -159,7 +164,7 @@ public class TeleOpMode extends OpMode
         telemetry.addData("Motors", "left (%.2f), right (%.2f)", leftPower, rightPower);
         telemetry.addData("Motor Pos", "left %d, right %d", robot.cageLiftL.getCurrentPosition(), robot.cageLiftR.getCurrentPosition());
         telemetry.addData("ROBOT LIFT POS:", "%d", robot.roboLift.getCurrentPosition());
-        telemetry.addData("Servo", "(%.2f)", robot.markerDrop.getPosition());
+        telemetry.addData("Servo", "(%.2f)", robot.liftRelease.getPosition());
         telemetry.addData("IMU: ", "heading(z) (%.2f), roll(x) (%.2f), pitch(y) (%.2f)", heading, roll, pitch);
         telemetry.update();
     }
