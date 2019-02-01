@@ -68,7 +68,7 @@ public class FT_Robot {
     /* Preset Values */
     // Intake speeds
     protected final double INTAKE_SPEED = 1.0;
-    protected final double INTAKE_SPEED_OUT = -0.4;
+    protected final double INTAKE_SPEED_OUT = -0.6;
 
     // Lifting position         // TODO: Check all of the encoder numbers
     protected final int TOP_LIFT = 1000;
@@ -77,7 +77,7 @@ public class FT_Robot {
     // add ground and top position for the robo lift
     protected final double LIFT_POWER_CAP = 0.4;
     protected final double UP_LIFT_SPEED = 0.45;
-    protected final double DOWN_LIFT_SPEED = 0.15;
+    protected final double DOWN_LIFT_SPEED = 0.1;
 
     //Toggle Values
     protected boolean lastLiftB = false;
@@ -132,7 +132,6 @@ public class FT_Robot {
 
         // Robot lift direction
         roboLift.setDirection(DcMotorSimple.Direction.FORWARD);
-//        roboLift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         roboLift.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
 
@@ -147,11 +146,9 @@ public class FT_Robot {
         cageIntake.setPower(0);
 
         // Cage lift manual controls init
-//        cageLiftL.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-//        cageLiftR.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         // TODO: Check if reseting encoders is necessary/ good idea
-        cageLiftL.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        cageLiftR.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+//        cageLiftL.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+//        cageLiftR.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
         //Initialize all servo
         markerDrop = hwMap.get(Servo.class, "marker_drop");
@@ -191,26 +188,27 @@ public class FT_Robot {
 
     /* Methods for all op modes*/
 
-    // TODO: Correct degree variation in if statement so that it works well
-//    public boolean overCrater(double currentAngle) {
-//        if ((currentAngle > (FLAT_SOURCE + 4)) || (currentAngle < (FLAT_SOURCE - 4))) {
-//            cageLiftL.setTargetPosition(CRATER_LIFT);
-//            cageLiftR.setTargetPosition(CRATER_LIFT);
-//            cageLiftL.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-//            cageLiftR.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-//            cageLiftL.setPower(0.2);
-//            cageLiftR.setPower(0.2);
-//            return true;
-//        } else {
-//            cageLiftL.setTargetPosition(GROUND_LIFT);
-//            cageLiftR.setTargetPosition(GROUND_LIFT);
-//            cageLiftL.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-//            cageLiftR.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-//            cageLiftL.setPower(0.2);
-//            cageLiftR.setPower(0.2);
-//            return false;
-//        }
-//    }
+    public void overCrater(double currentAngle, int rawR, int rawB, int rawG) {
+        // imu values
+        double maxAngle = FLAT_SOURCE + 0.5;
+        double minAngle = FLAT_SOURCE - 0.5;
+        // crater black
+        int darkThreshHold = 40;
+
+        liftSetup('a');
+        if (((currentAngle > maxAngle) || (currentAngle < minAngle)) ||
+                ((rawR < darkThreshHold) && (rawB < darkThreshHold) && (rawG < darkThreshHold))) {
+            cageLiftL.setTargetPosition(CRATER_LIFT);
+            cageLiftR.setTargetPosition(CRATER_LIFT);
+            cageLiftL.setPower(0.2);
+            cageLiftR.setPower(0.2);
+        } else {
+            cageLiftL.setTargetPosition(GROUND_LIFT);
+            cageLiftR.setTargetPosition(GROUND_LIFT);
+            cageLiftL.setPower(0.2);
+            cageLiftR.setPower(0.2);
+        }
+    }
 
     protected boolean liftIsBusy() {
         if (cageLiftL.isBusy() && cageLiftR.isBusy()) {

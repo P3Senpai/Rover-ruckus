@@ -50,7 +50,7 @@ public class Motor_Tester extends OpMode
         val -= 0.005;
     }
     if (gamepad1.a){
-        robot.cageLiftL.setPower(val);
+        robot.cageLiftL.setPower(val * -1);
         robot.cageLiftR.setPower(val);
     }else{
         robot.cageLiftR.setPower(0);

@@ -63,14 +63,12 @@ public class TeleOpMode extends OpMode
     robot.rightDriveF.setPower(rightPower * -1);
     robot.rightDriveB.setPower(rightPower);
     // endregion
-
+    // region element lift
     // Manual lift code below
         double liftPower  = Range.clip(gamepad2.left_stick_y, -1.0, 1.0);
         robot.cageLiftL.setPower(liftPower * robot.LIFT_POWER_CAP);
         robot.cageLiftR.setPower(liftPower * robot.LIFT_POWER_CAP );
-        if(gamepad2.left_stick_button){
-            manualToAuto(liftPower);
-        }
+        manualToAuto(liftPower, gamepad2.left_stick_button);
 
 
     // Automatized lifting
@@ -82,24 +80,32 @@ public class TeleOpMode extends OpMode
         robot.lastLiftB = true;
         // Set up automatized values
         robot.liftSetup('a');
-        if(currPosL == 900 && currPosR == 900){  // TODO: find acutal positions
+        // Toggle condition path
+        if(currPosL == 900 && currPosR == 900){
             robot.cageLiftR.setTargetPosition(0);
             robot.cageLiftL.setTargetPosition(0);
             robot.cageLiftR.setPower(0.15);
             robot.cageLiftL.setPower(0.15);
-        } else if (currPosL == 0 && currPosR == 0){ // TODO: find acutal positions
+        } else if (currPosL == 0 && currPosR == 0){
             robot.cageLiftR.setTargetPosition(900);
             robot.cageLiftL.setTargetPosition(900);
             robot.cageLiftR.setPower(0.45);
             robot.cageLiftL.setPower(0.45);
         }
-    } else if (robot.lastLiftB) {
+    } else if (!robot.liftIsBusy()) {
+        robot.liftSetup('m');
+    }else if (robot.lastLiftB){
         robot.lastLiftB = false;
     }
-    // changing to manual when lift isn't working
-    if(!robot.liftIsBusy()){
-        robot.liftSetup('m');
-    }
+
+        // Automatized over crater lift
+        // imu values
+        double heading = robot.imu.getAngularOrientation().firstAngle;
+        double roll  = robot.imu.getAngularOrientation().secondAngle;
+        double pitch = robot.imu.getAngularOrientation().thirdAngle;
+//        robot.overCrater();
+
+    // endregion
 
     // region cage intake
         // cage intake code below  // TODO: remap buttons to driver preferences
@@ -112,10 +118,11 @@ public class TeleOpMode extends OpMode
     // endregion
 
         // Robot lift controls  TODO: Make lifting limits to stop the rail from breaking
-    if(gamepad2.dpad_up) {
+        int roboLiftPos = robot.roboLift.getCurrentPosition();
+    if(gamepad2.dpad_up ) { // && roboLiftPos <= 0
         robot.roboLift.setPower(1.0);
     }
-    else if(gamepad2.dpad_down){
+    else if(gamepad2.dpad_down ){ // && roboLiftPos >= -15853
         robot.roboLift.setPower(-1.0);
     }
     else
@@ -152,18 +159,11 @@ public class TeleOpMode extends OpMode
             robot.liftRelease.setPosition(0.8);
         // endregion
 
-        // Automized crater lift
-        // imu values
-        double heading = robot.imu.getAngularOrientation().firstAngle;
-        double roll  = robot.imu.getAngularOrientation().secondAngle;
-        double pitch = robot.imu.getAngularOrientation().thirdAngle;
-//        robot.overCrater();
-
         // Show the elapsed game time and wheel power.
         telemetry.addData("Status", "Run Time: " + runtime.toString());
         telemetry.addData("Motors", "left (%.2f), right (%.2f)", leftPower, rightPower);
         telemetry.addData("Motor Pos", "left %d, right %d", robot.cageLiftL.getCurrentPosition(), robot.cageLiftR.getCurrentPosition());
-        telemetry.addData("ROBOT LIFT POS:", "%d", robot.roboLift.getCurrentPosition());
+        telemetry.addData("ROBOT LIFT POS:", " %d", roboLiftPos);
         telemetry.addData("Servo", "(%.2f)", robot.liftRelease.getPosition());
         telemetry.addData("IMU: ", "heading(z) (%.2f), roll(x) (%.2f), pitch(y) (%.2f)", heading, roll, pitch);
         telemetry.update();
@@ -181,32 +181,32 @@ public class TeleOpMode extends OpMode
      *  TODO: should i incorporate alpha() values ????????????????????
      */
     private String rgbValueCalc(int rawBlue, int rawGreen, int rawRed){
-        double scaleFactor = 255;
-        int cleanBlue = (int) (rawBlue * scaleFactor);
-        int cleanGreen = (int) (rawGreen * scaleFactor);
-        int cleanRed = (int) (rawRed * scaleFactor);
-
-//          TODO: find value ranges
-//        if (/*yellow*/){
-//            return "Yellow";
-//            } //else if (){
-//            return "White";
-//       }
+        if ((rawBlue < 100) &&
+                (rawGreen > 200) &&
+                ( rawRed> 200)
+              ){
+            return "Yellow";
+            } else if (rawBlue == rawRed &&
+                        rawBlue == rawGreen &&
+                        rawGreen == rawRed &&
+                        rawBlue > 200){
+            return "White";
+       }
             return "Nothing";
     }
 
     // TODO: Change manual nums to variables
 
-    private void manualToAuto(double direction){
+    private void manualToAuto(double direction, boolean button){
         // Set automatic lift set run mode
         robot.liftSetup('a');
         // Deciding where to clip lifts
-        if (direction >= (0.3 * robot.LIFT_POWER_CAP)){
+        if ((direction >= (0.3 * robot.LIFT_POWER_CAP)) && button){
             robot.cageLiftL.setTargetPosition(900);
             robot.cageLiftR.setTargetPosition(900);
             robot.cageLiftL.setPower(0.45);
             robot.cageLiftR.setPower(0.45);
-        } else if (direction <= (-0.3 * robot.LIFT_POWER_CAP)){
+        } else if ((direction <= (-0.3 * robot.LIFT_POWER_CAP)) && button){
             robot.cageLiftL.setTargetPosition(0);
             robot.cageLiftR.setTargetPosition(0);
             robot.cageLiftL.setPower(0.15);
