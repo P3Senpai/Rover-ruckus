@@ -31,12 +31,10 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
-import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
-import com.qualcomm.robotcore.hardware.VoltageSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.navigation.Acceleration;
@@ -45,47 +43,38 @@ import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 public class FT_Robot {
     /* Dc motors  */
     // Drive train motors
-    protected DcMotor leftDriveF = null;
-    protected DcMotor rightDriveF = null;
-    protected DcMotor leftDriveB = null;
-    protected DcMotor rightDriveB = null;
-    // Cage Lift and Intake motors
-    protected DcMotor cageLiftL = null;
-    protected DcMotor cageLiftR = null;
+    protected DcMotor leftDrive = null;
+    protected DcMotor rightDrive = null;
+    // Linear extension and Intake motor
+    protected DcMotor pivotArm = null;
+    protected DcMotor extendingBig = null;
+    protected DcMotor extendingSmall = null;
+    protected DcMotor extendingPull = null;
     protected DcMotor cageIntake = null;
     // Robot lift motor
     protected DcMotor roboLift = null;
-
     /* Servos */
     protected Servo markerDrop = null;
-    protected Servo colorMove = null;
     protected Servo liftRelease = null;
 
     /* Sensors */
-    protected SensorIMU imuSensor = null;
-    protected ColorSensor color = null;
+    BNO055IMU imu; // The IMU sensor object
+
 
     /* Preset Values */
     // Intake speeds
     protected final double INTAKE_SPEED = 1.0;
     protected final double INTAKE_SPEED_OUT = -0.6;
 
-    // Lifting position         // TODO: Check all of the encoder numbers
-    protected final int TOP_LIFT = 1000;
-    protected final int GROUND_LIFT = 0;
-    protected final int CRATER_LIFT = 200;
-    // add ground and top position for the robo lift
-    protected final double LIFT_POWER_CAP = 0.4;
-    protected final double UP_LIFT_SPEED = 0.45;
-    protected final double DOWN_LIFT_SPEED = 0.1;
-
-    //Toggle Values
-    protected boolean lastLiftB = false;
-    // Calibrated angle on flat surface
-    protected final double FLAT_SOURCE = 85.0;   // TODO: Calibrate every time you go somewhere new
+    // TODO measure lenght in mm not cm
+    // TODO find x
+    // x = difference between starting and ending pos
+    double smallPulleyRotation =  x / (2*3.14*15); // Diameter of pulley is 30 mm
+    double largePulleyRotation = x / (2*3.14*30); // Diameter of pulley is 60 mm
+    double tighteningPullyRotation = x / (2*3.14*30); // TODO find out pulley size
+    // TODO find small pulley gear ratio
 
     // The IMU sensor object
-    BNO055IMU imu;
     // State used for updating telemetry
     Orientation angles;
     Acceleration gravity;
@@ -105,63 +94,51 @@ public class FT_Robot {
 
         // Define and Initialize Motors
         // Drive train
-        leftDriveF = hwMap.get(DcMotor.class, "left_drive_f");
-        rightDriveF = hwMap.get(DcMotor.class, "right_drive_f");
-        leftDriveB = hwMap.get(DcMotor.class, "left_drive_b");
-        rightDriveB = hwMap.get(DcMotor.class, "right_drive_b");
-        // Cage Lift
-        cageLiftL = hwMap.get(DcMotor.class, "cage_lift_l");
-        cageLiftR = hwMap.get(DcMotor.class, "cage_lift_r");
-        cageLiftL.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        cageLiftR.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-
-        // Robot lifting
+        leftDrive = hwMap.get(DcMotor.class, "left_drive");
+        rightDrive = hwMap.get(DcMotor.class, "right_drive");
+        extendingBig = hwMap.get(DcMotor.class, "extending_big");
+        extendingSmall = hwMap.get(DcMotor.class, "extending_small");
+        extendingPull = hwMap.get(DcMotor.class, "extending_pull");
         roboLift = hwMap.get(DcMotor.class, "robo_lift");
-        // Cage intake
         cageIntake = hwMap.get(DcMotor.class, "cage_intake");
+        pivotArm = hwMap.get(DcMotor.class, "pivot_arm");
 
         // Set drive train directions to motors
-        leftDriveF.setDirection(DcMotor.Direction.FORWARD);
-        leftDriveB.setDirection(DcMotor.Direction.FORWARD); // TODO: Test if
-        rightDriveF.setDirection(DcMotor.Direction.REVERSE);
-        rightDriveB.setDirection(DcMotor.Direction.REVERSE);
+        leftDrive.setDirection(DcMotor.Direction.FORWARD);
+        rightDrive.setDirection(DcMotor.Direction.REVERSE);
 
-        // Cage lift Directions
-        cageLiftL.setDirection(DcMotor.Direction.REVERSE);
-        cageLiftR.setDirection(DcMotor.Direction.FORWARD);
+        // Intake directions
+        extendingSmall.setDirection(DcMotorSimple.Direction.FORWARD); // since pulley is connected to robot by gear
+        extendingBig.setDirection(DcMotorSimple.Direction.REVERSE); // the pulley is directly attached
 
         // Robot lift direction
         roboLift.setDirection(DcMotorSimple.Direction.FORWARD);
-        roboLift.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        roboLift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
+        // Linear extension stopping motors from slipping
+        extendingBig.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        extendingPull.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        extendingSmall.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         // Set all motors to zero power
-        leftDriveF.setPower(0);
-        rightDriveF.setPower(0);
-        leftDriveB.setPower(0);
-        rightDriveB.setPower(0);
-        cageLiftL.setPower(0);
-        cageLiftR.setPower(0);
+        leftDrive.setPower(0);
+        rightDrive.setPower(0);
+        extendingPull.setPower(0);
+        extendingSmall.setPower(0);
+        extendingBig.setPower(0);
+        pivotArm.setPower(0);
         roboLift.setPower(0);
         cageIntake.setPower(0);
 
-        // Cage lift manual controls init
-        // TODO: Check if reseting encoders is necessary/ good idea
-//        cageLiftL.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-//        cageLiftR.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-
         //Initialize all servo
         markerDrop = hwMap.get(Servo.class, "marker_drop");
-        colorMove = hwMap.get(Servo.class, "color_move");
         liftRelease = hwMap.get(Servo.class, "lift_release");
 
         //TODO: add starting pos of ALL servos
         markerDrop.setPosition(0.5);
-        colorMove.setPosition(0.5); // other pos is (0.0)
         liftRelease.setPosition(0.8); // Other pos is (0.2)
 
         // Sensors
-//        color = hwMap.get(ColorSensor.class, "color_sensor");
 
     // imu init
         // Set up the parameters with which we will use our IMU. Note that integration
@@ -180,54 +157,14 @@ public class FT_Robot {
         // and named "imu".
         imu = hwMap.get(BNO055IMU.class, "imu");
         imu.initialize(parameters);
+        // Naming variables
+        double heading = imu.getAngularOrientation().firstAngle;
+        double roll  = imu.getAngularOrientation().secondAngle;
+        double pitch = imu.getAngularOrientation().thirdAngle;
     }
 
     // TODO: add ALL hwmap init to method below
     public void initAutonomous(HardwareMap ahwMap) {
-    }
-
-    /* Methods for all op modes*/
-
-    public void overCrater(double currentAngle, int rawR, int rawB, int rawG) {
-        // imu values
-        double maxAngle = FLAT_SOURCE + 0.5;
-        double minAngle = FLAT_SOURCE - 0.5;
-        // crater black
-        int darkThreshHold = 40;
-
-        liftSetup('a');
-        if (((currentAngle > maxAngle) || (currentAngle < minAngle)) ||
-                ((rawR < darkThreshHold) && (rawB < darkThreshHold) && (rawG < darkThreshHold))) {
-            cageLiftL.setTargetPosition(CRATER_LIFT);
-            cageLiftR.setTargetPosition(CRATER_LIFT);
-            cageLiftL.setPower(0.2);
-            cageLiftR.setPower(0.2);
-        } else {
-            cageLiftL.setTargetPosition(GROUND_LIFT);
-            cageLiftR.setTargetPosition(GROUND_LIFT);
-            cageLiftL.setPower(0.2);
-            cageLiftR.setPower(0.2);
-        }
-    }
-
-    protected boolean liftIsBusy() {
-        if (cageLiftL.isBusy() && cageLiftR.isBusy()) {
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    // inputs: 'a' or 'm'--> m means manual and a means automatic
-    // this setup method will be useful if there can't be 2 variables on the same motor
-    protected void liftSetup(char mode) {
-        if (mode == 'a') {
-            cageLiftL.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            cageLiftR.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        } else if (mode == 'm'){
-            cageLiftL.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-            cageLiftR.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        }
     }
 }
 
