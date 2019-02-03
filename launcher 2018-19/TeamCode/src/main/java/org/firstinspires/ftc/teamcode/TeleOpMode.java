@@ -14,10 +14,6 @@ public class TeleOpMode extends OpMode
     private ElapsedTime runtime = new ElapsedTime();
     private FT_Robot robot =  new FT_Robot();
 
-    private String elementColour;
-    private int whiteColor;
-    private int yellowColor;
-
      /*
      * Code to run ONCE when the driver hits INIT
      */
@@ -73,11 +69,15 @@ public class TeleOpMode extends OpMode
 
     // region arm pivot
         double pivotPower = Range.clip(gamepad2.right_stick_y, -1.0, 1.0);
-        pivotPower *= 0.6; // scale of pivot power
+        pivotPower *= 0.6; // scale of pivot power todo: test if it is strong enough?
         robot.pivotArm.setPower(pivotPower);
         robot.extendingBig.setPower(pivotPower/robot.largePulleyRotation);
-        robot.extendingSmall.setPower(pivotPower/robot.largePulleyRotation);
+        robot.extendingSmall.setPower(pivotPower/robot.smallPulleyRotation);
         robot.extendingPull.setPower(pivotPower/robot.tighteningPullyRotation);
+    // endregion
+
+    // region arm extension
+
     // endregion
 
     // region Robot lift controls  TODO: Make lifting limits to stop the rail from breaking
@@ -102,16 +102,16 @@ public class TeleOpMode extends OpMode
         robot.markerDrop.setPosition(pos- 0.05);
 
     // endregion
-
-        // region lift release
-        double releaseS = robot.liftRelease.getPosition();
-        if (gamepad2.x)
+        // todo: move to autonomous op mode
+    // region lift release
+    double releaseS = robot.liftRelease.getPosition();
+    if (gamepad2.x)
 //            robot.liftRelease.setPosition(releaseS + 0.05);
-            robot.liftRelease.setPosition(0.2);
-        else if (gamepad2.y)
+        robot.liftRelease.setPosition(0.2);
+    else if (gamepad2.y)
 //            robot.liftRelease.setPosition(releaseS - 0.05);
-            robot.liftRelease.setPosition(0.8);
-        // endregion
+        robot.liftRelease.setPosition(0.8);
+    // endregion
 
         telemetry.addData("Status", "Run Time: " + runtime.toString());
         telemetry.update();

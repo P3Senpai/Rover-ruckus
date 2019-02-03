@@ -64,15 +64,22 @@ public class FT_Robot {
     /* Preset Values */
     // Intake speeds
     protected final double INTAKE_SPEED = 1.0;
-    protected final double INTAKE_SPEED_OUT = -0.6;
+    protected final double INTAKE_SPEED_OUT = -0.6; // TODo: test if speeds apply to new design
 
     // TODO measure lenght in mm not cm
     // TODO find x
     // x = difference between starting and ending pos
-    double smallPulleyRotation =  x / (2*3.14*15); // Diameter of pulley is 30 mm
-    double largePulleyRotation = x / (2*3.14*30); // Diameter of pulley is 60 mm
-    double tighteningPullyRotation = x / (2*3.14*30); // TODO find out pulley size
+    double smallPulleyRotation =  x / (2*Math.PI*15*2); // Diameter of pulley is 30 mm * 2:1 gear ratio
+    double largePulleyRotation = x / (2*Math.PI*30); // Diameter of pulley is 60 mm
+    double tighteningPullyRotation = x / (2*Math.PI* y); // TODO find out pulley size ( y = pull radius)
     // TODO find small pulley gear ratio
+
+    // max length for linear extension
+    // todo find x
+    // x = difference between the max and min len of string
+    int smallPulleyMax = (int) x / (2*Math.PI*15*2); // 15 = diameter of 30mm pulley, 2 = 2:1 gear ratio
+    int bigPulleyMax = (int) x / (2*Math.PI*30); // 30 = diameter of 60 mm pulley
+    int tighteningPulleyMax = (int) x / (2*Math.PI* y); // y = diameter pulley, add gear ratio of there is one
 
     // The IMU sensor object
     // State used for updating telemetry
