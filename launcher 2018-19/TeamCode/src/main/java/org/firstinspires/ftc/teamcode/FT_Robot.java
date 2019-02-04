@@ -50,7 +50,7 @@ public class FT_Robot {
     protected DcMotor extendingBig = null;
     protected DcMotor extendingSmall = null;
     protected DcMotor extendingPull = null;
-    protected DcMotor cageIntake = null;
+//    protected DcMotor cageIntake = null;
     // Robot lift motor
     protected DcMotor roboLift = null;
     /* Servos */
@@ -66,20 +66,17 @@ public class FT_Robot {
     protected final double INTAKE_SPEED = 1.0;
     protected final double INTAKE_SPEED_OUT = -0.6; // TODo: test if speeds apply to new design
 
-    // TODO measure lenght in mm not cm
-    // TODO find x
-    // x = difference between starting and ending pos
-    double smallPulleyRotation =  x / (2*Math.PI*15*2); // Diameter of pulley is 30 mm * 2:1 gear ratio
-    double largePulleyRotation = x / (2*Math.PI*30); // Diameter of pulley is 60 mm
-    double tighteningPullyRotation = x / (2*Math.PI* y); // TODO find out pulley size ( y = pull radius)
-    // TODO find small pulley gear ratio
-
+    // first value = difference between starting and ending pos
+    double smallPulleyRotation =  99 / (2*Math.PI*15*2); // Radius of pulley is 30mm * 2:1 gear ratio
+    double bigPulleyRotation = 108 / (2*Math.PI*30); // Radius of pulley is 60mm
+    double tighteningPullyRotation = 392 / (2*Math.PI* 30); // Radius of pulley 60mm
+    double pivotRotation = x; // num of rotations (should be be less than 1 rotation
     // max length for linear extension
     // todo find x
     // x = difference between the max and min len of string
-    int smallPulleyMax = (int) x / (2*Math.PI*15*2); // 15 = diameter of 30mm pulley, 2 = 2:1 gear ratio
-    int bigPulleyMax = (int) x / (2*Math.PI*30); // 30 = diameter of 60 mm pulley
-    int tighteningPulleyMax = (int) x / (2*Math.PI* y); // y = diameter pulley, add gear ratio of there is one
+    int smallPulleyMax = (int) x / (2*Math.PI*15*2); // 15 = radius of 30mm pulley, 2 = 2:1 gear ratio
+    int bigPulleyMax = (int) x / (2*Math.PI*30); // 30 = radius of 60 mm pulley
+    int tighteningPulleyMax = (int) x / (2*Math.PI* 30); // 30 = radius of 60 mm pulley
 
     // The IMU sensor object
     // State used for updating telemetry
@@ -107,19 +104,25 @@ public class FT_Robot {
         extendingSmall = hwMap.get(DcMotor.class, "extending_small");
         extendingPull = hwMap.get(DcMotor.class, "extending_pull");
         roboLift = hwMap.get(DcMotor.class, "robo_lift");
-        cageIntake = hwMap.get(DcMotor.class, "cage_intake");
+//        cageIntake = hwMap.get(DcMotor.class, "cage_intake");
         pivotArm = hwMap.get(DcMotor.class, "pivot_arm");
 
         // Set drive train directions to motors
         leftDrive.setDirection(DcMotor.Direction.FORWARD);
         rightDrive.setDirection(DcMotor.Direction.REVERSE);
 
-        // Intake directions
-        extendingSmall.setDirection(DcMotorSimple.Direction.FORWARD); // since pulley is connected to robot by gear
-        extendingBig.setDirection(DcMotorSimple.Direction.REVERSE); // the pulley is directly attached
+        // Linear lift directions mode
+        extendingBig.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        extendingSmall.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        extendingPull.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        extendingBig.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        extendingSmall.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        extendingPull.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
 
         // Robot lift direction
         roboLift.setDirection(DcMotorSimple.Direction.FORWARD);
+        roboLift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         roboLift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
         // Linear extension stopping motors from slipping
@@ -135,7 +138,7 @@ public class FT_Robot {
         extendingBig.setPower(0);
         pivotArm.setPower(0);
         roboLift.setPower(0);
-        cageIntake.setPower(0);
+//        cageIntake.setPower(0);
 
         //Initialize all servo
         markerDrop = hwMap.get(Servo.class, "marker_drop");

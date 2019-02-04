@@ -56,41 +56,53 @@ public class TeleOpMode extends OpMode
         // Right Drive power
     robot.rightDrive.setPower(rightPower);
     // endregion
-
+    // todo cable management bef you un comment
     // region cage intake
-        // cage intake code below  // TODO: remap buttons to driver preferences
-    if (gamepad2.a)
-        robot.cageIntake.setPower(robot.INTAKE_SPEED);
-    else if (gamepad2.b)
-        robot.cageIntake.setPower(robot.INTAKE_SPEED_OUT);
-    else
-        robot.cageIntake.setPower(0.0);
+//        // cage intake code below  // TODO: remap buttons to driver preferences
+//    if (gamepad2.a)
+//        robot.cageIntake.setPower(robot.INTAKE_SPEED);
+//    else if (gamepad2.b)
+//        robot.cageIntake.setPower(robot.INTAKE_SPEED_OUT);
+//    else
+//        robot.cageIntake.setPower(0.0);
     // endregion
 
     // region arm pivot
         double pivotPower = Range.clip(gamepad2.right_stick_y, -1.0, 1.0);
         pivotPower *= 0.6; // scale of pivot power todo: test if it is strong enough?
         robot.pivotArm.setPower(pivotPower);
-        robot.extendingBig.setPower(pivotPower/robot.largePulleyRotation);
-        robot.extendingSmall.setPower(pivotPower/robot.smallPulleyRotation);
-        robot.extendingPull.setPower(pivotPower/robot.tighteningPullyRotation);
+        robot.extendingBig.setPower(pivotPower*robot.bigPulleyRotation);
+        robot.extendingSmall.setPower(pivotPower*robot.smallPulleyRotation);
+        robot.extendingPull.setPower(pivotPower*robot.tighteningPullyRotation);
     // endregion
 
     // region arm extension
-
+        double leftTrigger = Range.clip(gamepad2.left_trigger, 0.0, 1.0);
+        double rightTrigger = Range.clip(gamepad2.right_trigger, 0.0, 1.0);
+        rightTrigger *= -1; // changes direction of trigger
+        // todo check if this breaks the triggers for controls
+        // extend
+        robot.extendingSmall.setPower(leftTrigger);
+        robot.extendingBig.setPower(leftTrigger);
+        robot.extendingPull.setPower(leftTrigger); // todo check gear reduction
+        // contract
+        robot.extendingSmall.setPower(rightTrigger);
+        robot.extendingBig.setPower(rightTrigger);
+        robot.extendingPull.setPower(rightTrigger);
     // endregion
 
     // region Robot lift controls  TODO: Make lifting limits to stop the rail from breaking
         int roboLiftPos = robot.roboLift.getCurrentPosition();
-    if(gamepad2.dpad_up ) { // && roboLiftPos <= 0
+    if(gamepad1.dpad_up ) { // && roboLiftPos <= 0
         robot.roboLift.setPower(1.0);
     }
-    else if(gamepad2.dpad_down ){ // && roboLiftPos >= -15853
+    else if(gamepad1.dpad_down){ // && roboLiftPos >= -15853
         robot.roboLift.setPower(-1.0);
     }
     else
         robot.roboLift.setPower(0);
     // endregion
+
     //TODO: move to autonomous op mode
     // Todo; find if this necessary
     // region marker drop
@@ -113,6 +125,7 @@ public class TeleOpMode extends OpMode
         robot.liftRelease.setPosition(0.8);
     // endregion
 
+        // todo add data
         telemetry.addData("Status", "Run Time: " + runtime.toString());
         telemetry.update();
     }
