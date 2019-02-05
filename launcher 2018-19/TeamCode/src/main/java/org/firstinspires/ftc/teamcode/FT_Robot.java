@@ -50,7 +50,7 @@ public class FT_Robot {
     protected DcMotor extendingBig = null;
     protected DcMotor extendingSmall = null;
     protected DcMotor extendingPull = null;
-//    protected DcMotor cageIntake = null;
+    protected DcMotor cageIntake = null;
     // Robot lift motor
     protected DcMotor roboLift = null;
     /* Servos */
@@ -70,13 +70,13 @@ public class FT_Robot {
     double smallPulleyRotation =  99 / (2*Math.PI*15*2); // Radius of pulley is 30mm * 2:1 gear ratio
     double bigPulleyRotation = 108 / (2*Math.PI*30); // Radius of pulley is 60mm
     double tighteningPullyRotation = 392 / (2*Math.PI* 30); // Radius of pulley 60mm
-    double pivotRotation = x; // num of rotations (should be be less than 1 rotation
-    // max length for linear extension
-    // todo find x
-    // x = difference between the max and min len of string
-    int smallPulleyMax = (int) x / (2*Math.PI*15*2); // 15 = radius of 30mm pulley, 2 = 2:1 gear ratio
-    int bigPulleyMax = (int) x / (2*Math.PI*30); // 30 = radius of 60 mm pulley
-    int tighteningPulleyMax = (int) x / (2*Math.PI* 30); // 30 = radius of 60 mm pulley
+
+//    // max length for linear extension
+//    // todo find x
+//    // x = difference between the max and min len of string
+//    int smallPulleyMax = (int) x / (2*Math.PI*15*2); // 15 = radius of 30mm pulley, 2 = 2:1 gear ratio
+//    int bigPulleyMax = (int) x / (2*Math.PI*30); // 30 = radius of 60 mm pulley
+//    int tighteningPulleyMax = (int) x / (2*Math.PI* 30); // 30 = radius of 60 mm pulley
 
     // The IMU sensor object
     // State used for updating telemetry
@@ -104,7 +104,7 @@ public class FT_Robot {
         extendingSmall = hwMap.get(DcMotor.class, "extending_small");
         extendingPull = hwMap.get(DcMotor.class, "extending_pull");
         roboLift = hwMap.get(DcMotor.class, "robo_lift");
-//        cageIntake = hwMap.get(DcMotor.class, "cage_intake");
+        cageIntake = hwMap.get(DcMotor.class, "cage_intake");
         pivotArm = hwMap.get(DcMotor.class, "pivot_arm");
 
         // Set drive train directions to motors
@@ -130,6 +130,10 @@ public class FT_Robot {
         extendingPull.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         extendingSmall.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
+        // undo brake mode from auto on drive motors
+        leftDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+        rightDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+
         // Set all motors to zero power
         leftDrive.setPower(0);
         rightDrive.setPower(0);
@@ -141,11 +145,10 @@ public class FT_Robot {
 //        cageIntake.setPower(0);
 
         //Initialize all servo
-        markerDrop = hwMap.get(Servo.class, "marker_drop");
+//        markerDrop = hwMap.get(Servo.class, "marker_drop");
         liftRelease = hwMap.get(Servo.class, "lift_release");
 
         //TODO: add starting pos of ALL servos
-        markerDrop.setPosition(0.5);
         liftRelease.setPosition(0.8); // Other pos is (0.2)
 
         // Sensors
@@ -175,6 +178,11 @@ public class FT_Robot {
 
     // TODO: add ALL hwmap init to method below
     public void initAutonomous(HardwareMap ahwMap) {
+
+
+        // driving stops
+        leftDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        rightDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
     }
 }
 

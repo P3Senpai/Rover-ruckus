@@ -3,25 +3,26 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
-@TeleOp(name="Lift test", group="Iterative Opmode")
+@TeleOp(name="Motor Config Checker", group="Iterative Opmode")
 @Disabled
 
-public class Motor_Tester extends OpMode
+public class test extends OpMode
 {
     // Declare OpMode members.
     private ElapsedTime runtime = new ElapsedTime();
-    private FT_Robot robot =  new FT_Robot();
-    double val = 0;
+    private DcMotor one = null;
+
      /*
      * Code to run ONCE when the driver hits INIT
      */
 
     @Override
     public void init() {
-        robot.initTeleOp(hardwareMap);
+        one = hardwareMap.get(DcMotor.class, "one");
     }
 
     /*
@@ -45,26 +46,12 @@ public class Motor_Tester extends OpMode
     @Override
     public void loop() {
 
-    if (gamepad1.dpad_up && val <= 1) {
-        val += 0.005;
-    } else if (gamepad1.dpad_down && val >= -1) {
-        val -= 0.005;
-    }
-    if (gamepad1.a){
-        robot.cageLiftL.setPower(val * -1);
-        robot.cageLiftR.setPower(val);
-    }else{
-        robot.cageLiftR.setPower(0);
-        robot.cageLiftL.setPower(0);
-        val *= 0;
-    }
+    if (gamepad1.a)
+        one.setPower(0.1);
 
-
-    // Show the elapsed game time and wheel power.
-    telemetry.addData("Status", "Run Time: " + runtime.toString());
-    telemetry.addData("Motors", "SPEED (%.3f)", val);
-        telemetry.addData("Motors", "yeetR (%.3f), yeetL (%.3f)", robot.cageLiftR.getPower(), robot.cageLiftL.getPower());
-    telemetry.update();
+        // todo add data
+        telemetry.addData("Status", "Run Time: " + runtime.toString());
+        telemetry.update();
     }
 
     /*
@@ -73,4 +60,6 @@ public class Motor_Tester extends OpMode
     @Override
     public void stop() {
     }
+
+
 }

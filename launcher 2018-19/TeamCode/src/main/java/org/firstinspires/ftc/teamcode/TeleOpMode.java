@@ -46,7 +46,7 @@ public class TeleOpMode extends OpMode
 
     // region driving
     // Set up driving so that robot can be controlled with 1 joystick (gp1, left)
-    double drive  = -gamepad1.left_stick_y;
+    double drive  = -gamepad1.left_stick_y;  //todo check driving directions
     double turn   =  gamepad1.left_stick_x;
     double leftPower    = Range.clip(drive - turn, -1.0, 1.0) ;
     double rightPower   = Range.clip(drive + turn, -1.0, 1.0) ;
@@ -56,15 +56,15 @@ public class TeleOpMode extends OpMode
         // Right Drive power
     robot.rightDrive.setPower(rightPower);
     // endregion
-    // todo cable management bef you un comment
+
     // region cage intake
-//        // cage intake code below  // TODO: remap buttons to driver preferences
-//    if (gamepad2.a)
-//        robot.cageIntake.setPower(robot.INTAKE_SPEED);
-//    else if (gamepad2.b)
-//        robot.cageIntake.setPower(robot.INTAKE_SPEED_OUT);
-//    else
-//        robot.cageIntake.setPower(0.0);
+        // cage intake code below  // TODO: remap buttons to driver preferences
+    if (gamepad2.a)
+        robot.cageIntake.setPower(robot.INTAKE_SPEED);
+    else if (gamepad2.b)
+        robot.cageIntake.setPower(robot.INTAKE_SPEED_OUT);
+    else
+        robot.cageIntake.setPower(0.0);
     // endregion
 
     // region arm pivot
@@ -80,11 +80,11 @@ public class TeleOpMode extends OpMode
         double leftTrigger = Range.clip(gamepad2.left_trigger, 0.0, 1.0);
         double rightTrigger = Range.clip(gamepad2.right_trigger, 0.0, 1.0);
         rightTrigger *= -1; // changes direction of trigger
-        // todo check if this breaks the triggers for controls
+
         // extend
         robot.extendingSmall.setPower(leftTrigger);
         robot.extendingBig.setPower(leftTrigger);
-        robot.extendingPull.setPower(leftTrigger); // todo check gear reduction
+        robot.extendingPull.setPower(leftTrigger); // todo check to slow down???
         // contract
         robot.extendingSmall.setPower(rightTrigger);
         robot.extendingBig.setPower(rightTrigger);
@@ -101,28 +101,6 @@ public class TeleOpMode extends OpMode
     }
     else
         robot.roboLift.setPower(0);
-    // endregion
-
-    //TODO: move to autonomous op mode
-    // Todo; find if this necessary
-    // region marker drop
-        // Marker Drop only test for autonomous
-        double pos = robot.markerDrop.getPosition();
-    if (gamepad1.a)
-        robot.markerDrop.setPosition(pos+ 0.05);
-    else if (gamepad1.b)
-        robot.markerDrop.setPosition(pos- 0.05);
-
-    // endregion
-        // todo: move to autonomous op mode
-    // region lift release
-    double releaseS = robot.liftRelease.getPosition();
-    if (gamepad2.x)
-//            robot.liftRelease.setPosition(releaseS + 0.05);
-        robot.liftRelease.setPosition(0.2);
-    else if (gamepad2.y)
-//            robot.liftRelease.setPosition(releaseS - 0.05);
-        robot.liftRelease.setPosition(0.8);
     // endregion
 
         // todo add data

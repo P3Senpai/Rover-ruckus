@@ -69,7 +69,7 @@ import org.firstinspires.ftc.robotcontroller.external.samples.HardwarePushbot;
 public class Autonomous extends LinearOpMode {
 
     /* Declare OpMode members. */
-    HardwarePushbot         robot   = new HardwarePushbot();   // Use a Pushbot's hardware
+    FT_Robot robot   = new FT_Robot();
     static String mineralPos; /** My code */
     private ElapsedTime runtime = new ElapsedTime();
 
@@ -77,6 +77,7 @@ public class Autonomous extends LinearOpMode {
     public void runOpMode() {
 
         TenserFlow tf = new TenserFlow(); /** My code */
+        robot.initAutonomous(hardwareMap);
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
 /********************************************************************************/
@@ -92,9 +93,34 @@ public class Autonomous extends LinearOpMode {
     // todo add move by encoder meathod
 
     private void moveByEncoder(){}
-    private void turnByEoncoder(double speed, double angle, double holdTime){
+    private void turnByEoncoder(double speed, double targetAngle, double holdTime){
+        // set up of parameters
         ElapsedTime holdTimer = new ElapsedTime();
-        angle = Math.abs(angle);
+        targetAngle = Math.abs(targetAngle);
+        speed = Math.abs(speed);
+        // other var
+        double currAngle = robot.imu.getAngularOrientation().thirdAngle;
+        double leftMotorDirection;
+        double rightMotorDirection;
+        double leftSide = targetAngle + 180;
+        // spin left or right
+        if ((currAngle > targetAngle) && (currAngle <= leftSide)){
+            leftMotorDirection = -1;
+            rightMotorDirection = 1;
+        }else{
+            leftMotorDirection = 1;
+            rightMotorDirection = -1;
+        }
+
+        holdTimer.reset();
+        while(opModeIsActive() &&
+               holdTimer.seconds() <= holdTime &&
+                currAngle != targetAngle){
+            robot.leftDrive.setPower(speed * leftMotorDirection);
+            robot.rightDrive.setPower(speed * rightMotorDirection);
+            telemetry.addData("Degrees left till target postion", targetAngle - currAngle);
+            telemetry.update();
+        }
     }
     private void servoMotion(Servo servo, double endPos, double holdTime){
         ElapsedTime holdTimer = new ElapsedTime();
