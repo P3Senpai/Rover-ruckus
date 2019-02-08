@@ -47,8 +47,8 @@ public class FT_Robot {
     protected DcMotor rightDrive = null;
     // Linear extension and Intake motor
     protected DcMotor pivotArm = null;
-    protected DcMotor extendingBig = null;
-    protected DcMotor extendingSmall = null;
+    protected DcMotor extendingPulley = null;
+    protected DcMotor extendingSprocket = null;
     protected DcMotor extendingPull = null;
     protected DcMotor cageIntake = null;
     // Robot lift motor
@@ -66,17 +66,21 @@ public class FT_Robot {
     protected final double INTAKE_SPEED = 1.0;
     protected final double INTAKE_SPEED_OUT = -0.6; // TODo: test if speeds apply to new design
 
-    // first value = difference between starting and ending pos
-    double smallPulleyRotation =  99 / (2*Math.PI*15*2); // Radius of pulley is 30mm * 2:1 gear ratio
-    double bigPulleyRotation = 108 / (2*Math.PI*30); // Radius of pulley is 60mm
-    double tighteningPullyRotation = 392 / (2*Math.PI* 30); // Radius of pulley 60mm
+    protected double drivingWheelToCm = 560 / (9 * Math.PI); // 9 is diameter of wheel, 560 is counts per revolution
 
-//    // max length for linear extension
-//    // todo find x
-//    // x = difference between the max and min len of string
-//    int smallPulleyMax = (int) x / (2*Math.PI*15*2); // 15 = radius of 30mm pulley, 2 = 2:1 gear ratio
-//    int bigPulleyMax = (int) x / (2*Math.PI*30); // 30 = radius of 60 mm pulley
-//    int tighteningPulleyMax = (int) x / (2*Math.PI* 30); // 30 = radius of 60 mm pulley
+    // first value = difference between starting and ending pos
+    // this accounts for num of rotations
+    int pulleyToCm = (int) (560 / (5 * Math.PI)); // 5 = 5cm diameter of pulley
+    double halfOfTinyPulleyCir = (0.097 * Math.PI) / 2;
+    double extendingDifference = (42 * (3 * halfOfTinyPulleyCir)) - (120 * (3* halfOfTinyPulleyCir));
+
+    int extPulleyMax = (int) (pulleyToCm * extendingDifference);  // todo value should be negative test spin
+    int extSprocketMax = (int) (pulleyToCm * extendingDifference); // todo value should be negative test spin 
+    int extContractPulley = (int) pulleyToCm * x; // right most value
+
+    int pivPulleyMax = (int) (pulleyToCm * 14); // middle value    | 34cm (top) - 20cm (bottom) |
+    int pivSprockedMax = (int) (pulleyToCm * 5); // left most value  | 31cm (top) - 26cm (bottom) |
+    int pivContractMax = (int) (pulleyToCm * 34.5); // right most value | 40.5cm (top) - 6cm (bottom) |
 
     // The IMU sensor object
     // State used for updating telemetry
@@ -100,23 +104,23 @@ public class FT_Robot {
         // Drive train
         leftDrive = hwMap.get(DcMotor.class, "left_drive");
         rightDrive = hwMap.get(DcMotor.class, "right_drive");
-        extendingBig = hwMap.get(DcMotor.class, "extending_big");
-        extendingSmall = hwMap.get(DcMotor.class, "extending_small");
+        extendingPulley = hwMap.get(DcMotor.class, "extending_big");
+        extendingSprocket = hwMap.get(DcMotor.class, "extending_small");
         extendingPull = hwMap.get(DcMotor.class, "extending_pull");
         roboLift = hwMap.get(DcMotor.class, "robo_lift");
         cageIntake = hwMap.get(DcMotor.class, "cage_intake");
         pivotArm = hwMap.get(DcMotor.class, "pivot_arm");
 
         // Set drive train directions to motors
-        leftDrive.setDirection(DcMotor.Direction.FORWARD);
-        rightDrive.setDirection(DcMotor.Direction.REVERSE);
+        leftDrive.setDirection(DcMotor.Direction.REVERSE);
+        rightDrive.setDirection(DcMotor.Direction.FORWARD);
 
         // Linear lift directions mode
-        extendingBig.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        extendingSmall.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        extendingPulley.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        extendingSprocket.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         extendingPull.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        extendingBig.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        extendingSmall.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        extendingPulley.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        extendingSprocket.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         extendingPull.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
 
@@ -126,9 +130,10 @@ public class FT_Robot {
         roboLift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
         // Linear extension stopping motors from slipping
-        extendingBig.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        extendingPulley.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         extendingPull.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        extendingSmall.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        extendingSprocket.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        pivotArm.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         // undo brake mode from auto on drive motors
         leftDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
@@ -138,8 +143,8 @@ public class FT_Robot {
         leftDrive.setPower(0);
         rightDrive.setPower(0);
         extendingPull.setPower(0);
-        extendingSmall.setPower(0);
-        extendingBig.setPower(0);
+        extendingSprocket.setPower(0);
+        extendingPulley.setPower(0);
         pivotArm.setPower(0);
         roboLift.setPower(0);
 //        cageIntake.setPower(0);
@@ -178,7 +183,84 @@ public class FT_Robot {
 
     // TODO: add ALL hwmap init to method below
     public void initAutonomous(HardwareMap ahwMap) {
+// Save reference to Hardware map
+        hwMap = ahwMap;
 
+        // Define and Initialize Motors
+        // Drive train
+        leftDrive = hwMap.get(DcMotor.class, "left_drive");
+        rightDrive = hwMap.get(DcMotor.class, "right_drive");
+        extendingPulley = hwMap.get(DcMotor.class, "extending_big");
+        extendingSprocket = hwMap.get(DcMotor.class, "extending_small");
+        extendingPull = hwMap.get(DcMotor.class, "extending_pull");
+        roboLift = hwMap.get(DcMotor.class, "robo_lift");
+        cageIntake = hwMap.get(DcMotor.class, "cage_intake");
+        pivotArm = hwMap.get(DcMotor.class, "pivot_arm");
+
+        // Set drive train directions to motors
+        leftDrive.setDirection(DcMotor.Direction.FORWARD);
+        rightDrive.setDirection(DcMotor.Direction.REVERSE);
+
+        // Linear lift directions mode
+        extendingPulley.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        extendingSprocket.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        extendingPull.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        extendingPulley.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        extendingSprocket.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        extendingPull.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+
+        // Robot lift direction
+        roboLift.setDirection(DcMotorSimple.Direction.FORWARD);
+        roboLift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        roboLift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+        // Linear extension stopping motors from slipping
+        extendingPulley.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        extendingPull.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        extendingSprocket.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        
+
+        // Set all motors to zero power
+        leftDrive.setPower(0);
+        rightDrive.setPower(0);
+        extendingPull.setPower(0);
+        extendingSprocket.setPower(0);
+        extendingPulley.setPower(0);
+        pivotArm.setPower(0);
+        roboLift.setPower(0);
+//        cageIntake.setPower(0);
+
+        //Initialize all servo
+//        markerDrop = hwMap.get(Servo.class, "marker_drop");
+        liftRelease = hwMap.get(Servo.class, "lift_release");
+
+        //TODO: add starting pos of ALL servos
+        liftRelease.setPosition(0.8); // Other pos is (0.2)
+
+        // Sensors
+
+        // imu init
+        // Set up the parameters with which we will use our IMU. Note that integration
+        // algorithm here just reports accelerations to the logcat log; it doesn't actually
+        // provide positional information.
+        BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
+        parameters.angleUnit           = BNO055IMU.AngleUnit.DEGREES;
+        parameters.accelUnit           = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
+        parameters.calibrationDataFile = "BNO055IMUCalibration.json"; // see the calibration sample opmode
+        parameters.loggingEnabled      = true;
+        parameters.loggingTag          = "IMU";
+        parameters.accelerationIntegrationAlgorithm = new JustLoggingAccelerationIntegrator();
+
+        // Retrieve and initialize the IMU. We expect the IMU to be attached to an I2C port
+        // on a Core Device Interface Module, configured to be a sensor of type "AdaFruit IMU",
+        // and named "imu".
+        imu = hwMap.get(BNO055IMU.class, "imu");
+        imu.initialize(parameters);
+        // Naming variables
+        double heading = imu.getAngularOrientation().firstAngle;
+        double roll  = imu.getAngularOrientation().secondAngle;
+        double pitch = imu.getAngularOrientation().thirdAngle;
 
         // driving stops
         leftDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);

@@ -29,13 +29,10 @@
 
 package org.firstinspires.ftc.teamcode;
 
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
-
-import org.firstinspires.ftc.robotcontroller.external.samples.HardwarePushbot;
 
 /**
  * This file illustrates the concept of driving a path based on encoder counts.
@@ -64,8 +61,8 @@ import org.firstinspires.ftc.robotcontroller.external.samples.HardwarePushbot;
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
-@com.qualcomm.robotcore.eventloop.opmode.Autonomous(name="Pushbot: Auto Drive By Encoder", group="Pushbot")
-@Disabled
+@com.qualcomm.robotcore.eventloop.opmode.Autonomous(name="Autonomous", group="Autonomous")
+//@Disabled
 public class Autonomous extends LinearOpMode {
 
     /* Declare OpMode members. */
@@ -90,10 +87,42 @@ public class Autonomous extends LinearOpMode {
         telemetry.update();
     }
 
-    // todo add move by encoder meathod
+    // todo add move by encoder method
 
-    private void moveByEncoder(){}
-    private void turnByEoncoder(double speed, double targetAngle, double holdTime){
+    private void moveByEncoder(double speed, double leftDistance, double rightDistance, double timeOut){
+        ElapsedTime timer = new ElapsedTime();
+        double wheelToDistance = 2 * Math.PI * 45;
+        // calculate target distance
+        int leftCurrentPosition = robot.leftDrive.getCurrentPosition();
+        int rightCurrentPostition = robot.rightDrive.getCurrentPosition();
+        int leftTarget = leftCurrentPosition+ (int) (leftDistance * robot.drivingWheelToCm);
+        int rightTarget = rightCurrentPostition + (int) (rightDistance* robot.drivingWheelToCm);
+
+        // convert motor to run to pos
+        robot.leftDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        robot.rightDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+        //set target pos
+        robot.leftDrive.setTargetPosition(leftTarget);
+        robot.rightDrive.setTargetPosition(rightTarget);
+
+        // Reset and start
+        timer.reset();
+        robot.leftDrive.setPower(Math.abs(speed));
+        robot.rightDrive.setPower(Math.abs(speed));
+        while (opModeIsActive() &&
+                robot.leftDrive.isBusy() &&
+                robot.rightDrive.isBusy() &&
+                timer.seconds() <= timeOut){
+            telemetry.addData("Current driving position: ", " L:%7d R:%7d", leftCurrentPosition, rightCurrentPostition);
+            telemetry.addData("Distance left till target: ", " L:%7d R:%7d", leftTarget - leftCurrentPosition, rightTarget - rightCurrentPostition);
+            telemetry.update();
+        }
+        telemetry.addLine("Driving complete :)");
+        telemetry.update();
+
+    }
+    private void turnByAngle(double speed, double targetAngle, double holdTime){
         // set up of parameters
         ElapsedTime holdTimer = new ElapsedTime();
         targetAngle = Math.abs(targetAngle);
@@ -118,9 +147,12 @@ public class Autonomous extends LinearOpMode {
                 currAngle != targetAngle){
             robot.leftDrive.setPower(speed * leftMotorDirection);
             robot.rightDrive.setPower(speed * rightMotorDirection);
-            telemetry.addData("Degrees left till target postion", targetAngle - currAngle);
+            telemetry.addData("Current degrees: ", currAngle);
+            telemetry.addData("Degrees left till target position: ", targetAngle - currAngle);
             telemetry.update();
         }
+        telemetry.addLine("Turn Complete :)");
+        telemetry.update();
     }
     private void servoMotion(Servo servo, double endPos, double holdTime){
         ElapsedTime holdTimer = new ElapsedTime();

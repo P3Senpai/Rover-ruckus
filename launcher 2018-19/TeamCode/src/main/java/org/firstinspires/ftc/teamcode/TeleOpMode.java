@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
@@ -69,26 +70,14 @@ public class TeleOpMode extends OpMode
 
     // region arm pivot
         double pivotPower = Range.clip(gamepad2.right_stick_y, -1.0, 1.0);
-        pivotPower *= 0.6; // scale of pivot power todo: test if it is strong enough?
-        robot.pivotArm.setPower(pivotPower);
-        robot.extendingBig.setPower(pivotPower*robot.bigPulleyRotation);
-        robot.extendingSmall.setPower(pivotPower*robot.smallPulleyRotation);
-        robot.extendingPull.setPower(pivotPower*robot.tighteningPullyRotation);
+            robot.pivotArm.setPower(pivotPower);
+
+
     // endregion
 
     // region arm extension
         double leftTrigger = Range.clip(gamepad2.left_trigger, 0.0, 1.0);
         double rightTrigger = Range.clip(gamepad2.right_trigger, 0.0, 1.0);
-        rightTrigger *= -1; // changes direction of trigger
-
-        // extend
-        robot.extendingSmall.setPower(leftTrigger);
-        robot.extendingBig.setPower(leftTrigger);
-        robot.extendingPull.setPower(leftTrigger); // todo check to slow down???
-        // contract
-        robot.extendingSmall.setPower(rightTrigger);
-        robot.extendingBig.setPower(rightTrigger);
-        robot.extendingPull.setPower(rightTrigger);
     // endregion
 
     // region Robot lift controls  TODO: Make lifting limits to stop the rail from breaking
@@ -105,6 +94,8 @@ public class TeleOpMode extends OpMode
 
         // todo add data
         telemetry.addData("Status", "Run Time: " + runtime.toString());
+        telemetry.addData("dir", "big %s small %s", robot.extendingPulley.getDirection().toString(), robot.extendingSprocket.getDirection().toString());
+        telemetry.addData("Triggers: ", "L-(%.2f) R-(%.2f)", leftTrigger, rightTrigger);
         telemetry.update();
     }
 
@@ -115,5 +106,27 @@ public class TeleOpMode extends OpMode
     public void stop() {
     }
 
+    public void linearMotion(int max, int min, DcMotor motor, int currPos, double power){
+        // Setting up variables
+        int maxRotationPerCycle = 70; // 70 in encoder value, which is equivalent to 0.125 rotations at 300rpm per 25ms
+        int appendRotation = (int) (power * maxRotationPerCycle);
+        double speed = Math.abs(power);
 
+        // checks if motor is outside range between min and max
+        if ((currPos < min) || (max < currPos)){       // if not within range
+            if (currPos < min && power > 0) {   // if above range and moving down
+                motor.setTargetPosition(currPos + appendRotation);
+                motor.setPower(speed);
+            } else if (currPos > max && power < 0) {  // if below range and moving up
+                motor.setTargetPosition(currPos + appendRotation);
+                motor.setPower(speed);
+            }else {                                                 // Else stop moving
+                motor.setTargetPosition(currPos);
+                motor.setPower(0);
+            }
+        } else {
+            motor.setTargetPosition(currPos + appendRotation);
+            motor.setPower(speed);
+        }
+    }
 }
