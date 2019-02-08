@@ -54,7 +54,7 @@ public class FT_Robot {
     // Robot lift motor
     protected DcMotor roboLift = null;
     /* Servos */
-    protected Servo markerDrop = null;
+
     protected Servo liftRelease = null;
 
     /* Sensors */
@@ -62,9 +62,6 @@ public class FT_Robot {
 
 
     /* Preset Values */
-    // Intake speeds
-    protected final double INTAKE_SPEED = 1.0;
-    protected final double INTAKE_SPEED_OUT = -0.6; // TODo: test if speeds apply to new design
 
     protected double drivingWheelToCm = 560 / (9 * Math.PI); // 9 is diameter of wheel, 560 is counts per revolution
 
@@ -75,8 +72,8 @@ public class FT_Robot {
     double extendingDifference = (42 * (3 * halfOfTinyPulleyCir)) - (120 * (3* halfOfTinyPulleyCir));
 
     int extPulleyMax = (int) (pulleyToCm * extendingDifference);  // todo value should be negative test spin
-    int extSprocketMax = (int) (pulleyToCm * extendingDifference); // todo value should be negative test spin 
-    int extContractPulley = (int) pulleyToCm * x; // right most value
+    int extSprocketMax = (int) (pulleyToCm * extendingDifference); // todo value should be negative test spin
+    int extContractPulleyMax = 2310; // Encoder value found by tightening manually
 
     int pivPulleyMax = (int) (pulleyToCm * 14); // middle value    | 34cm (top) - 20cm (bottom) |
     int pivSprockedMax = (int) (pulleyToCm * 5); // left most value  | 31cm (top) - 26cm (bottom) |
@@ -119,9 +116,9 @@ public class FT_Robot {
         extendingPulley.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         extendingSprocket.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         extendingPull.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        extendingPulley.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        extendingSprocket.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        extendingPull.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        extendingPulley.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        extendingSprocket.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        extendingPull.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
 
         // Robot lift direction
@@ -135,6 +132,7 @@ public class FT_Robot {
         extendingSprocket.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         pivotArm.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
+
         // undo brake mode from auto on drive motors
         leftDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
         rightDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
@@ -147,10 +145,9 @@ public class FT_Robot {
         extendingPulley.setPower(0);
         pivotArm.setPower(0);
         roboLift.setPower(0);
-//        cageIntake.setPower(0);
+        cageIntake.setPower(0);
 
         //Initialize all servo
-//        markerDrop = hwMap.get(Servo.class, "marker_drop");
         liftRelease = hwMap.get(Servo.class, "lift_release");
 
         //TODO: add starting pos of ALL servos
@@ -202,12 +199,13 @@ public class FT_Robot {
         rightDrive.setDirection(DcMotor.Direction.REVERSE);
 
         // Linear lift directions mode
-        extendingPulley.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        extendingSprocket.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        extendingPull.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        extendingPulley.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        extendingSprocket.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        extendingPull.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+//        extendingPulley.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+//        extendingSprocket.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+//        extendingPull.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+//        extendingPulley.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+//        extendingSprocket.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+//        extendingPull.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        extendingPull.setDirection(DcMotorSimple.Direction.REVERSE);
 
 
         // Robot lift direction

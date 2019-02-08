@@ -61,9 +61,9 @@ import com.qualcomm.robotcore.util.ElapsedTime;
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
-@com.qualcomm.robotcore.eventloop.opmode.Autonomous(name="Autonomous", group="Autonomous")
+@com.qualcomm.robotcore.eventloop.opmode.Autonomous(name="crater Autonomous", group="Autonomous")
 //@Disabled
-public class Autonomous extends LinearOpMode {
+public class craterAutonomous extends LinearOpMode {
 
     /* Declare OpMode members. */
     FT_Robot robot   = new FT_Robot();
@@ -79,8 +79,45 @@ public class Autonomous extends LinearOpMode {
         waitForStart();
 /********************************************************************************/
 
+        // drop from lander
+        // todo check if i want advance before cube
         tf.runOpMode(); /** My code */
+        turnByAngle(0.4, 90,3);
+        if(mineralPos.equals("center")){
+            moveByEncoder(0.6, 68,68,7); // original diastance +5
+            moveByEncoder(0.6, -68,-68,7);
+            // todo go to depot
+            // todo drop marker
+            // go to crater
+            turnByAngle(0.4, 180, 5);
+            moveByEncoder(0.6,195,195, 10);
 
+        }else if(mineralPos.equals("left")){
+            moveByEncoder(0.6, 23,23,3); // go to x
+            turnByAngle(0.4, 42.208,2); // turn to mineral
+            moveByEncoder(0.6, 59,59,3); //sample mineral +5cm of original dis
+            // go back to x
+            moveByEncoder(0.6, -59,-59,3);
+            turnByAngle(0.4, -42.208,2);
+            // todo go to depot
+            //todo drop marker
+            // move to crater
+            turnByAngle(0.4, 180, 2);
+            moveByEncoder(0.6,195,195, 10);
+        }
+        else if(mineralPos.equals("right")){
+            moveByEncoder(0.6, 23,23,3); // go to x
+            turnByAngle(0.4, -42.208,2); // turn to mineral
+            moveByEncoder(0.6, 59,59,3); // sample mineral +5cm of original dis
+            moveByEncoder(0.6, -54,-54,3);
+            turnByAngle(0.4, 42.208,2);
+            //todo go to depot
+            //todo drop marker
+            // move to crater
+            turnByAngle(0.4, 180, 2);
+            moveByEncoder(0.6,195,195, 10);
+
+        }
 
         telemetry.addData("Path", "Complete");
         telemetry.addData( "Mineral Position: ", mineralPos);
@@ -95,7 +132,8 @@ public class Autonomous extends LinearOpMode {
         // calculate target distance
         int leftCurrentPosition = robot.leftDrive.getCurrentPosition();
         int rightCurrentPostition = robot.rightDrive.getCurrentPosition();
-        int leftTarget = leftCurrentPosition+ (int) (leftDistance * robot.drivingWheelToCm);
+
+        int leftTarget = leftCurrentPosition + (int) (leftDistance * robot.drivingWheelToCm);
         int rightTarget = rightCurrentPostition + (int) (rightDistance* robot.drivingWheelToCm);
 
         // convert motor to run to pos
@@ -110,30 +148,40 @@ public class Autonomous extends LinearOpMode {
         timer.reset();
         robot.leftDrive.setPower(Math.abs(speed));
         robot.rightDrive.setPower(Math.abs(speed));
+
         while (opModeIsActive() &&
-                robot.leftDrive.isBusy() &&
-                robot.rightDrive.isBusy() &&
-                timer.seconds() <= timeOut){
+                timer.seconds() < timeOut &&
+                (robot.leftDrive.isBusy() && robot.rightDrive.isBusy())
+                ){
             telemetry.addData("Current driving position: ", " L:%7d R:%7d", leftCurrentPosition, rightCurrentPostition);
             telemetry.addData("Distance left till target: ", " L:%7d R:%7d", leftTarget - leftCurrentPosition, rightTarget - rightCurrentPostition);
+            telemetry.addData("Time left: ", "(%.2f)", timeOut-timer.seconds());
             telemetry.update();
         }
         telemetry.addLine("Driving complete :)");
         telemetry.update();
 
+        // Stop all motors
+        robot.leftDrive.setPower(0.0);
+        robot.rightDrive.setPower(0.0);
+
+        // Turn off run to position
+        robot.leftDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        robot.rightDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
     }
-    private void turnByAngle(double speed, double targetAngle, double holdTime){
+    private void turnByAngle(double speed, double turnAngle, double timeOut){
         // set up of parameters
-        ElapsedTime holdTimer = new ElapsedTime();
-        targetAngle = Math.abs(targetAngle);
+        ElapsedTime timer = new ElapsedTime();
+        double currAngle = robot.imu.getAngularOrientation().thirdAngle;
+        double targetAngle = Math.abs((currAngle + turnAngle));
         speed = Math.abs(speed);
         // other var
-        double currAngle = robot.imu.getAngularOrientation().thirdAngle;
         double leftMotorDirection;
         double rightMotorDirection;
-        double leftSide = targetAngle + 180;
+
         // spin left or right
-        if ((currAngle > targetAngle) && (currAngle <= leftSide)){
+        if (turnAngle < 180){
             leftMotorDirection = -1;
             rightMotorDirection = 1;
         }else{
@@ -141,18 +189,27 @@ public class Autonomous extends LinearOpMode {
             rightMotorDirection = -1;
         }
 
-        holdTimer.reset();
+        timer.reset();
         while(opModeIsActive() &&
-               holdTimer.seconds() <= holdTime &&
-                currAngle != targetAngle){
+               timer.seconds() <= timeOut &&
+                currAngle != turnAngle){
             robot.leftDrive.setPower(speed * leftMotorDirection);
             robot.rightDrive.setPower(speed * rightMotorDirection);
             telemetry.addData("Current degrees: ", currAngle);
-            telemetry.addData("Degrees left till target position: ", targetAngle - currAngle);
+            telemetry.addData("Degrees left till target position: ", turnAngle - currAngle);
+            telemetry.addData("Time left: ", "(%.2f)", timeOut-timer.seconds());
             telemetry.update();
         }
         telemetry.addLine("Turn Complete :)");
         telemetry.update();
+
+        // Stop all motors
+        robot.leftDrive.setPower(0.0);
+        robot.rightDrive.setPower(0.0);
+
+        // Turn off run to position
+        robot.leftDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        robot.rightDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
     }
     private void servoMotion(Servo servo, double endPos, double holdTime){
         ElapsedTime holdTimer = new ElapsedTime();

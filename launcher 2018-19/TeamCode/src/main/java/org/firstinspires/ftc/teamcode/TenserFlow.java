@@ -29,7 +29,6 @@
 
 package org.firstinspires.ftc.teamcode;
 
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
@@ -130,14 +129,14 @@ public class TenserFlow extends LinearOpMode {
                         if (goldMineralX != -1 && silverMineral1X != -1 && silverMineral2X != -1) {
                           if (goldMineralX < silverMineral1X && goldMineralX < silverMineral2X) {
                             telemetry.addData("Gold Mineral Position", "Left");
-                            Autonomous.mineralPos = "left";
+                            depotAutonomous.mineralPos = "left";
 
                           } else if (goldMineralX > silverMineral1X && goldMineralX > silverMineral2X) {
                             telemetry.addData("Gold Mineral Position", "Right");
-                              Autonomous.mineralPos = "right";
+                              depotAutonomous.mineralPos = "right";
                           } else {
                             telemetry.addData("Gold Mineral Position", "Center");
-                              Autonomous.mineralPos = "center";
+                              depotAutonomous.mineralPos = "center";
                           }
                           // todo add break line after it detects
                             break;

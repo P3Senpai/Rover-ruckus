@@ -45,57 +45,90 @@ public class TeleOpMode extends OpMode
     @Override
     public void loop() {
 
-    // region driving
+    // region gustav's controls (gp1)
+        // region driving
     // Set up driving so that robot can be controlled with 1 joystick (gp1, left)
     double drive  = -gamepad1.left_stick_y;  //todo check driving directions
     double turn   =  gamepad1.left_stick_x;
-    double leftPower    = Range.clip(drive - turn, -1.0, 1.0) ;
-    double rightPower   = Range.clip(drive + turn, -1.0, 1.0) ;
+    double leftPower    = Range.clip(drive + turn, -1.0, 1.0) ;
+    double rightPower   = Range.clip(drive - turn, -1.0, 1.0) ;
 
         //Left Drive Power
     robot.leftDrive.setPower(leftPower);
         // Right Drive power
     robot.rightDrive.setPower(rightPower);
+        // Extra gusti controls
+    if (gamepad1.dpad_up){
+        robot.leftDrive.setPower(1.0);
+        robot.rightDrive.setPower(1.0);
+    }else if(gamepad1.dpad_down){
+        robot.leftDrive.setPower(-1.0);
+        robot.rightDrive.setPower(-1.0);
+    }else if(gamepad1.dpad_left){
+        robot.leftDrive.setPower(-1.0);
+        robot.rightDrive.setPower(1.0);
+    }else if(gamepad1.dpad_right){
+        robot.leftDrive.setPower(1.0);
+        robot.rightDrive.setPower(-1.0);
+    }else{
+        robot.leftDrive.setPower(0.0);
+        robot.rightDrive.setPower(0.0);
+    }
+    // endregion
+        // region Robot lift controls
+        if(gamepad1.y) { // && roboLiftPos <= 0
+            robot.roboLift.setPower(1.0);
+        }
+        else if(gamepad1.a){ // && roboLiftPos >= -15853
+            robot.roboLift.setPower(-1.0);
+        }
+        else
+            robot.roboLift.setPower(0);
+        // endregion
+
     // endregion
 
-    // region cage intake
+    // region Jun Sang's code (gp2)
+        // region cage intake
         // cage intake code below  // TODO: remap buttons to driver preferences
     if (gamepad2.a)
-        robot.cageIntake.setPower(robot.INTAKE_SPEED);
+        robot.cageIntake.setPower(1.0);
     else if (gamepad2.b)
-        robot.cageIntake.setPower(robot.INTAKE_SPEED_OUT);
+        robot.cageIntake.setPower(-0.6);
     else
         robot.cageIntake.setPower(0.0);
     // endregion
+        // region arm pivot
+        double pivotPower = Range.clip(gamepad2.left_stick_y, -1.0, 1.0);
+        robot.pivotArm.setPower(pivotPower * 0.6);
+        robot.extendingPulley.setPower(pivotPower * 0.4);
+        robot.extendingSprocket.setPower(pivotPower * 0.4);
+        robot.extendingPull.setPower(pivotPower * 0.3);
 
-    // region arm pivot
-        double pivotPower = Range.clip(gamepad2.right_stick_y, -1.0, 1.0);
-            robot.pivotArm.setPower(pivotPower);
-
+    // endregion
+        // region arm extension
+        double rightJoy = Range.clip(gamepad2.right_stick_y, -1.0, 1.0);
+        robot.extendingSprocket.setPower(rightJoy);
+        robot.extendingPulley.setPower(rightJoy);
+        robot.extendingPull.setPower(rightJoy * 0.6);
+    // endregion
 
     // endregion
 
-    // region arm extension
-        double leftTrigger = Range.clip(gamepad2.left_trigger, 0.0, 1.0);
-        double rightTrigger = Range.clip(gamepad2.right_trigger, 0.0, 1.0);
-    // endregion
-
-    // region Robot lift controls  TODO: Make lifting limits to stop the rail from breaking
-        int roboLiftPos = robot.roboLift.getCurrentPosition();
-    if(gamepad1.dpad_up ) { // && roboLiftPos <= 0
-        robot.roboLift.setPower(1.0);
-    }
-    else if(gamepad1.dpad_down){ // && roboLiftPos >= -15853
-        robot.roboLift.setPower(-1.0);
-    }
-    else
-        robot.roboLift.setPower(0);
-    // endregion
+        // testing pin release servo
+        double pos = robot.liftRelease.getPosition();
+        if (gamepad1.a){
+            robot.liftRelease.setPosition(pos + 0.05);
+        }else if(gamepad1.b){
+            robot.liftRelease.setPosition(pos - 0.05);
+        }
 
         // todo add data
         telemetry.addData("Status", "Run Time: " + runtime.toString());
         telemetry.addData("dir", "big %s small %s", robot.extendingPulley.getDirection().toString(), robot.extendingSprocket.getDirection().toString());
-        telemetry.addData("Triggers: ", "L-(%.2f) R-(%.2f)", leftTrigger, rightTrigger);
+        telemetry.addData("Servo pull: ", "Pos:(%.2f)", robot.liftRelease.getPosition());
+        telemetry.addData("Pulley test", "Pos: %d", robot.extendingPull.getCurrentPosition());
+        telemetry.addData("Heading:", "(%.2f)", robot.imu.getAngularOrientation().firstAngle);
         telemetry.update();
     }
 
@@ -116,17 +149,17 @@ public class TeleOpMode extends OpMode
         if ((currPos < min) || (max < currPos)){       // if not within range
             if (currPos < min && power > 0) {   // if above range and moving down
                 motor.setTargetPosition(currPos + appendRotation);
-                motor.setPower(speed);
+                motor.setPower(1.0);
             } else if (currPos > max && power < 0) {  // if below range and moving up
                 motor.setTargetPosition(currPos + appendRotation);
-                motor.setPower(speed);
+                motor.setPower(1.0);
             }else {                                                 // Else stop moving
                 motor.setTargetPosition(currPos);
                 motor.setPower(0);
             }
         } else {
             motor.setTargetPosition(currPos + appendRotation);
-            motor.setPower(speed);
+            motor.setPower(1.0);
         }
     }
 }
