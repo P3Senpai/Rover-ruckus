@@ -66,9 +66,10 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 public class depotAutonomous extends LinearOpMode {
 
     /* Declare OpMode members. */
-    FT_Robot robot   = new FT_Robot();
+    private FT_Robot robot   = new FT_Robot();
     static String mineralPos; /** My code */
     private ElapsedTime runtime = new ElapsedTime();
+    private ElapsedTime totalTime = new ElapsedTime();
 
     @Override
     public void runOpMode() {
@@ -78,59 +79,89 @@ public class depotAutonomous extends LinearOpMode {
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
 /********************************************************************************/
-
+        totalTime.reset();
         // drop from lander
-        // todo check if i want advance before cube
-        tf.runOpMode(); /** My code */
-        turnByAngle(0.4, 90,3);
-        if(mineralPos.equals("center")){
-            moveByEncoder(0.6, 105,105,10);
-            // todo drop marker
-            moveByEncoder(0.6, -105,-105,10);
+        while (opModeIsActive() &&
+                totalTime.seconds() <= 27) {
+
+//            runtime.reset();
+//            while (opModeIsActive() &&
+//                    runtime.seconds() < 2) {
+//                robot.roboLift.setPower(-1.0);
+//            }
+//            servoMotion(robot.liftRelease, 1, 2);
+//            sleep(200);
+            // todo check if i want advance before cube
+
+            // check for mineral only for 7 sec otherwise
+//        runtime.reset();
+//        while (opModeIsActive() &&
+//                tf.tflowEnd &&
+//                runtime.seconds() < 4) {
+//            tf.runOpMode(); /** My code */
+//        }
+//        turnByAngle(0.4, 90,3);
+//        if(mineralPos.equals("center")){
+//            moveByEncoder(0.6, 105,105,10);
+//            //deploy marker
+//            servoMotion(robot.teamMarker, 0.5, 2);
+//            moveByEncoder(0.6, -105,-105,10);
+//            // go to crater
+//            turnByAngle(0.4, 90, 3);
+//            moveByEncoder(0.6,195,195, 10);
+//
+//        }else if(mineralPos.equals("left")){
+//            moveByEncoder(0.6, 23,23,3); // go to x
+//            turnByAngle(0.4, 42.208,2); // turn to mineral
+//            moveByEncoder(0.6, 54,54,3); //go to mineral
+//            turnByAngle(0.4, -42.208, 2); // turn towards depot
+//            moveByEncoder(0.6, 55,55,3); // push mineral into depot
+//            //deploy marker
+//            servoMotion(robot.teamMarker, 0.5, 2);
+//            // reverse to steps
+//            moveByEncoder(0.6, -55,-55,3);
+//            turnByAngle(0.4, 42.208, 2);
+//            moveByEncoder(0.6, -54,-54,3);
+//            turnByAngle(0.4, -42.208,2);
+//            // move to crater
+//            turnByAngle(0.4, 90, 2);
+//            moveByEncoder(0.6,195,195, 10);
+//        }
+//        else if(mineralPos.equals("right")){
+//            moveByEncoder(0.6, 23,23,3); // go to x
+//            turnByAngle(0.4, -42.208,2); // turn to mineral
+//            moveByEncoder(0.6, 54,54,3); // go to mineral
+//            turnByAngle(0.4, 42.208, 2); // turn towards depot
+//            moveByEncoder(0.6, 55,55,3); // push mineral into depot
+//            //deploy marker
+//            servoMotion(robot.teamMarker, 0.5, 2);
+//            // reverse to steps
+//            moveByEncoder(0.6, -55,-55,3);
+//            turnByAngle(0.4, -42.208, 2);
+//            moveByEncoder(0.6, -54,-54,3);
+//            turnByAngle(0.4, 42.208,2);
+//            // move to crater
+//            turnByAngle(0.4, 90, 2);
+//            moveByEncoder(0.6,195,195, 10);
+//
+//        }else{ // if no mineral is detected then it will act as if mineral is in center
+//            moveByEncoder(0.6, 95, 95, 10);
+            //deploy marker
+//            servoMotion(robot.teamMarker, 1, 2);
             // go to crater
-            turnByAngle(0.4, 90, 3);
-            moveByEncoder(0.6,195,195, 10);
+//            turnByAngle(0.4, 90, 3);
+//            moveByEncoder(0.6, 195, 195, 10);
+//        }
 
-        }else if(mineralPos.equals("left")){
-            moveByEncoder(0.6, 23,23,3); // go to x
-            turnByAngle(0.4, 42.208,2); // turn to mineral
-            moveByEncoder(0.6, 54,54,3); //go to mineral
-            turnByAngle(0.4, -42.208, 2); // turn towards depot
-            moveByEncoder(0.6, 55,55,3); // push mineral into depot
-            //todo drop marker
-            // reverse to steps
-            moveByEncoder(0.6, -55,-55,3);
-            turnByAngle(0.4, 42.208, 2);
-            moveByEncoder(0.6, -54,-54,3);
-            turnByAngle(0.4, -42.208,2);
-            // move to crater
-            turnByAngle(0.4, 90, 2);
-            moveByEncoder(0.6,195,195, 10);
+            moveByEncoder(0.6, 90, 90, 10);
+            servoMotion(robot.teamMarker, 1, 2);
+            moveByEncoder(0.6, -20, -20, 10);
+
+            telemetry.addData("Path", "Complete");
+            telemetry.update();
+            break;
         }
-        else if(mineralPos.equals("right")){
-            moveByEncoder(0.6, 23,23,3); // go to x
-            turnByAngle(0.4, -42.208,2); // turn to mineral
-            moveByEncoder(0.6, 54,54,3); // go to mineral
-            turnByAngle(0.4, 42.208, 2); // turn towards depot
-            moveByEncoder(0.6, 55,55,3); // push mineral into depot
-            //todo drop marker
-            // reverse to steps
-            moveByEncoder(0.6, -55,-55,3);
-            turnByAngle(0.4, -42.208, 2);
-            moveByEncoder(0.6, -54,-54,3);
-            turnByAngle(0.4, 42.208,2);
-            // move to crater
-            turnByAngle(0.4, 90, 2);
-            moveByEncoder(0.6,195,195, 10);
-
-        }
-
-        telemetry.addData("Path", "Complete");
-        telemetry.addData( "Mineral Position: ", mineralPos);
-        telemetry.update();
     }
-
-    // todo add move by encoder method
 
     private void moveByEncoder(double speed, double leftDistance, double rightDistance, double timeOut){
         ElapsedTime timer = new ElapsedTime();
@@ -153,7 +184,7 @@ public class depotAutonomous extends LinearOpMode {
         // Reset and start
         timer.reset();
         robot.leftDrive.setPower(Math.abs(speed));
-        robot.rightDrive.setPower(Math.abs(speed));
+        robot.rightDrive.setPower(Math.abs(speed - 0.415));
 
         while (opModeIsActive() &&
                 timer.seconds() < timeOut &&
@@ -179,7 +210,7 @@ public class depotAutonomous extends LinearOpMode {
     private void turnByAngle(double speed, double turnAngle, double timeOut){
         // set up of parameters
         ElapsedTime timer = new ElapsedTime();
-        double currAngle = robot.imu.getAngularOrientation().thirdAngle;
+        double currAngle = robot.imu.getAngularOrientation().secondAngle;
         double targetAngle = Math.abs((currAngle + turnAngle));
         speed = Math.abs(speed);
         // other var
@@ -187,7 +218,7 @@ public class depotAutonomous extends LinearOpMode {
         double rightMotorDirection;
 
         // spin left or right
-        if (turnAngle < 180){
+        if ((turnAngle < 180) && (0 < turnAngle)){
             leftMotorDirection = -1;
             rightMotorDirection = 1;
         }else{
@@ -197,8 +228,8 @@ public class depotAutonomous extends LinearOpMode {
 
         timer.reset();
         while(opModeIsActive() &&
-               timer.seconds() <= timeOut &&
-                currAngle != turnAngle){
+               timer.seconds() < timeOut &&
+                currAngle != targetAngle){
             robot.leftDrive.setPower(speed * leftMotorDirection);
             robot.rightDrive.setPower(speed * rightMotorDirection);
             telemetry.addData("Current degrees: ", currAngle);

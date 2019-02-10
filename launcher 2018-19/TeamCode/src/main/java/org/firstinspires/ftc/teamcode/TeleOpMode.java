@@ -76,10 +76,10 @@ public class TeleOpMode extends OpMode
     }
     // endregion
         // region Robot lift controls
-        if(gamepad1.y) { // && roboLiftPos <= 0
+        if(gamepad2.y) { // && roboLiftPos <= 0
             robot.roboLift.setPower(1.0);
         }
-        else if(gamepad1.a){ // && roboLiftPos >= -15853
+        else if(gamepad2.a){ // && roboLiftPos >= -15853
             robot.roboLift.setPower(-1.0);
         }
         else
@@ -89,35 +89,39 @@ public class TeleOpMode extends OpMode
     // endregion
 
     // region Jun Sang's code (gp2)
-        // region cage intake
-        // cage intake code below  // TODO: remap buttons to driver preferences
-    if (gamepad2.a)
-        robot.cageIntake.setPower(1.0);
-    else if (gamepad2.b)
-        robot.cageIntake.setPower(-0.6);
-    else
-        robot.cageIntake.setPower(0.0);
-    // endregion
-        // region arm pivot
-        double pivotPower = Range.clip(gamepad2.left_stick_y, -1.0, 1.0);
-        robot.pivotArm.setPower(pivotPower * 0.6);
-        robot.extendingPulley.setPower(pivotPower * 0.4);
-        robot.extendingSprocket.setPower(pivotPower * 0.4);
-        robot.extendingPull.setPower(pivotPower * 0.3);
+//        // region cage intake
+//        // cage intake code below  // TODO: remap buttons to driver preferences
+//    if (gamepad2.a)
+//        robot.cageIntake.setPower(1.0);
+//    else if (gamepad2.b)
+//        robot.cageIntake.setPower(-0.6);
+//    else
+//        robot.cageIntake.setPower(0.0);
 
-    // endregion
-        // region arm extension
-        double rightJoy = Range.clip(gamepad2.right_stick_y, -1.0, 1.0);
-        robot.extendingSprocket.setPower(rightJoy);
-        robot.extendingPulley.setPower(rightJoy);
-        robot.extendingPull.setPower(rightJoy * 0.6);
-    // endregion
+//        // region arm pivot
+//        double pivotPower = Range.clip(gamepad2.left_stick_y, -1.0, 1.0);
+//        robot.pivotArm.setPower(pivotPower * 0.6);
+//        robot.extendingPulley.setPower(pivotPower * 0.4);
+//        robot.extendingSprocket.setPower(pivotPower * 0.4);
+//        robot.extendingPull.setPower(pivotPower * 0.3);
+//
+//        // region arm extension
+//        double rightJoy = Range.clip(-gamepad2.right_stick_y, -1.0, 1.0);
+//        if(rightJoy>0) {
+//            robot.extendingSprocket.setPower(rightJoy);
+//            robot.extendingPulley.setPower(rightJoy);
+//            robot.extendingPull.setPower(rightJoy * 0.3);
+//        }else if(rightJoy < 0){
+//            robot.extendingSprocket.setPower(rightJoy* 0.15);
+//            robot.extendingPulley.setPower(rightJoy* 0.15);
+//            robot.extendingPull.setPower(rightJoy * 0.8);
+//        }
 
     // endregion
 
         // testing pin release servo
         double pos = robot.liftRelease.getPosition();
-        if (gamepad1.a){
+        if (gamepad1.x){
             robot.liftRelease.setPosition(pos + 0.05);
         }else if(gamepad1.b){
             robot.liftRelease.setPosition(pos - 0.05);
@@ -128,7 +132,7 @@ public class TeleOpMode extends OpMode
         telemetry.addData("dir", "big %s small %s", robot.extendingPulley.getDirection().toString(), robot.extendingSprocket.getDirection().toString());
         telemetry.addData("Servo pull: ", "Pos:(%.2f)", robot.liftRelease.getPosition());
         telemetry.addData("Pulley test", "Pos: %d", robot.extendingPull.getCurrentPosition());
-        telemetry.addData("Heading:", "(%.2f)", robot.imu.getAngularOrientation().firstAngle);
+        telemetry.addData("akdjfa;lksdfj","(%.2f)", robot.teamMarker.getPosition());
         telemetry.update();
     }
 

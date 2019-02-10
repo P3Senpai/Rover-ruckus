@@ -56,6 +56,7 @@ public class FT_Robot {
     /* Servos */
 
     protected Servo liftRelease = null;
+    protected Servo teamMarker = null;
 
     /* Sensors */
     BNO055IMU imu; // The IMU sensor object
@@ -112,14 +113,12 @@ public class FT_Robot {
         leftDrive.setDirection(DcMotor.Direction.REVERSE);
         rightDrive.setDirection(DcMotor.Direction.FORWARD);
 
-        // Linear lift directions mode
-        extendingPulley.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        extendingSprocket.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        extendingPull.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        extendingPulley.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        extendingSprocket.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        extendingPull.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        //Linear lift Dir
+        extendingSprocket.setDirection(DcMotorSimple.Direction.REVERSE); // todo check if dir good???
+        extendingPulley.setDirection(DcMotorSimple.Direction.REVERSE);
 
+        // intake reverse dir
+        cageIntake.setDirection(DcMotorSimple.Direction.REVERSE);
 
         // Robot lift direction
         roboLift.setDirection(DcMotorSimple.Direction.FORWARD);
@@ -149,38 +148,13 @@ public class FT_Robot {
 
         //Initialize all servo
         liftRelease = hwMap.get(Servo.class, "lift_release");
+        teamMarker = hwMap.get(Servo.class, "team_marker");
 
-        //TODO: add starting pos of ALL servos
-        liftRelease.setPosition(0.8); // Other pos is (0.2)
-
-        // Sensors
-
-    // imu init
-        // Set up the parameters with which we will use our IMU. Note that integration
-        // algorithm here just reports accelerations to the logcat log; it doesn't actually
-        // provide positional information.
-        BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
-        parameters.angleUnit           = BNO055IMU.AngleUnit.DEGREES;
-        parameters.accelUnit           = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
-        parameters.calibrationDataFile = "BNO055IMUCalibration.json"; // see the calibration sample opmode
-        parameters.loggingEnabled      = true;
-        parameters.loggingTag          = "IMU";
-        parameters.accelerationIntegrationAlgorithm = new JustLoggingAccelerationIntegrator();
-
-        // Retrieve and initialize the IMU. We expect the IMU to be attached to an I2C port
-        // on a Core Device Interface Module, configured to be a sensor of type "AdaFruit IMU",
-        // and named "imu".
-        imu = hwMap.get(BNO055IMU.class, "imu");
-        imu.initialize(parameters);
-        // Naming variables
-        double heading = imu.getAngularOrientation().firstAngle;
-        double roll  = imu.getAngularOrientation().secondAngle;
-        double pitch = imu.getAngularOrientation().thirdAngle;
     }
 
     // TODO: add ALL hwmap init to method below
     public void initAutonomous(HardwareMap ahwMap) {
-// Save reference to Hardware map
+        // Save reference to Hardware map
         hwMap = ahwMap;
 
         // Define and Initialize Motors
@@ -195,29 +169,17 @@ public class FT_Robot {
         pivotArm = hwMap.get(DcMotor.class, "pivot_arm");
 
         // Set drive train directions to motors
-        leftDrive.setDirection(DcMotor.Direction.FORWARD);
-        rightDrive.setDirection(DcMotor.Direction.REVERSE);
-
-        // Linear lift directions mode
-//        extendingPulley.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-//        extendingSprocket.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-//        extendingPull.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-//        extendingPulley.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-//        extendingSprocket.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-//        extendingPull.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        extendingPull.setDirection(DcMotorSimple.Direction.REVERSE);
-
+        leftDrive.setDirection(DcMotor.Direction.REVERSE);
+        rightDrive.setDirection(DcMotor.Direction.FORWARD);
 
         // Robot lift direction
         roboLift.setDirection(DcMotorSimple.Direction.FORWARD);
         roboLift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         roboLift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
-        // Linear extension stopping motors from slipping
-        extendingPulley.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        extendingPull.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        extendingSprocket.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        
+        // brake mode for sharp turns
+        leftDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        rightDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         // Set all motors to zero power
         leftDrive.setPower(0);
@@ -227,16 +189,16 @@ public class FT_Robot {
         extendingPulley.setPower(0);
         pivotArm.setPower(0);
         roboLift.setPower(0);
-//        cageIntake.setPower(0);
+        cageIntake.setPower(0);
 
         //Initialize all servo
-//        markerDrop = hwMap.get(Servo.class, "marker_drop");
         liftRelease = hwMap.get(Servo.class, "lift_release");
+        teamMarker = hwMap.get(Servo.class, "team_marker");
 
         //TODO: add starting pos of ALL servos
-        liftRelease.setPosition(0.8); // Other pos is (0.2)
+        liftRelease.setPosition(0.0); // Other pos is (0.2)
+        teamMarker.setPosition(0.0);
 
-        // Sensors
 
         // imu init
         // Set up the parameters with which we will use our IMU. Note that integration
@@ -259,10 +221,6 @@ public class FT_Robot {
         double heading = imu.getAngularOrientation().firstAngle;
         double roll  = imu.getAngularOrientation().secondAngle;
         double pitch = imu.getAngularOrientation().thirdAngle;
-
-        // driving stops
-        leftDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        rightDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
     }
 }
 

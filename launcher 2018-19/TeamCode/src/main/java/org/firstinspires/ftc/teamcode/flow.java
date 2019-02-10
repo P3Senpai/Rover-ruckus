@@ -61,14 +61,15 @@ import com.qualcomm.robotcore.util.ElapsedTime;
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
-@com.qualcomm.robotcore.eventloop.opmode.Autonomous(name="crater Autonomous", group="Autonomous")
+@com.qualcomm.robotcore.eventloop.opmode.Autonomous(name="flow", group="Autonomous")
 //@Disabled
-public class craterAutonomous extends LinearOpMode {
+public class flow extends LinearOpMode {
 
     /* Declare OpMode members. */
     FT_Robot robot   = new FT_Robot();
     static String mineralPos; /** My code */
     private ElapsedTime runtime = new ElapsedTime();
+    static boolean tflowEnd = false;
 
     @Override
     public void runOpMode() {
@@ -79,73 +80,12 @@ public class craterAutonomous extends LinearOpMode {
         waitForStart();
 /********************************************************************************/
 
-        // drop from lander
-        runtime.reset();
-        while (opModeIsActive() &&
-                runtime.seconds() < 3){
-            robot.roboLift.setPower(1.0);
-        }
-        servoMotion(robot.liftRelease, 1,2);
-        // todo check if i want advance before cube
-
-        // check for mineral only for 7 sec otherwise
-        runtime.reset();
-        while (opModeIsActive() &&
-                tf.tflowEnd &&
-                runtime.seconds() < 4) {
-            tf.runOpMode(); /** My code */
-        }
-        turnByAngle(0.4, 90,3);
-        if(mineralPos.equals("center")){
-            moveByEncoder(0.6, 68,68,7); // original diastance +5
-            moveByEncoder(0.6, -68,-68,7);
-            // todo go to depot
-            runtime.reset();
-            while (runtime.seconds() < 3){ // dropping marker
-                robot.cageIntake.setPower(-0.8);
-            }
-            // go to crater
-            turnByAngle(0.4, 180, 5);
-            moveByEncoder(0.6,195,195, 10);
-
-        }else if(mineralPos.equals("left")){
-            moveByEncoder(0.6, 23,23,3); // go to x
-            turnByAngle(0.4, 42.208,2); // turn to mineral
-            moveByEncoder(0.6, 59,59,3); //sample mineral +5cm of original dis
-            // go back to x
-            moveByEncoder(0.6, -59,-59,3);
-            turnByAngle(0.4, -42.208,2);
-            // todo go to depot
-            runtime.reset();
-            //deploy marker
-            servoMotion(robot.teamMarker, 0.5, 2);
-            // move to crater
-            turnByAngle(0.4, 180, 2);
-            moveByEncoder(0.6,195,195, 10);
-        }
-        else if(mineralPos.equals("right")){
-            moveByEncoder(0.6, 23,23,3); // go to x
-            turnByAngle(0.4, -42.208,2); // turn to mineral
-            moveByEncoder(0.6, 59,59,3); // sample mineral +5cm of original dis
-            moveByEncoder(0.6, -54,-54,3);
-            turnByAngle(0.4, 42.208,2);
-            //todo go to depot
-            //deploy marker
-            servoMotion(robot.teamMarker, 0.5, 2);
-            // move to crater
-            turnByAngle(0.4, 180, 2);
-            moveByEncoder(0.6,195,195, 10);
-        }else{
-            telemetry.addLine("There is no mineral position");
-            telemetry.update();
-        }
+        tf.runOpMode();
 
         telemetry.addData("Path", "Complete");
         telemetry.addData( "Mineral Position: ", mineralPos);
         telemetry.update();
     }
-
-    // todo add move by encoder method
 
     private void moveByEncoder(double speed, double leftDistance, double rightDistance, double timeOut){
         ElapsedTime timer = new ElapsedTime();
@@ -194,7 +134,7 @@ public class craterAutonomous extends LinearOpMode {
     private void turnByAngle(double speed, double turnAngle, double timeOut){
         // set up of parameters
         ElapsedTime timer = new ElapsedTime();
-        double currAngle = robot.imu.getAngularOrientation().thirdAngle;
+        double currAngle = robot.imu.getAngularOrientation().secondAngle;
         double targetAngle = Math.abs((currAngle + turnAngle));
         speed = Math.abs(speed);
         // other var
@@ -202,7 +142,7 @@ public class craterAutonomous extends LinearOpMode {
         double rightMotorDirection;
 
         // spin left or right
-        if (turnAngle < 180){
+        if ((turnAngle < 180) && (0 < turnAngle)){
             leftMotorDirection = -1;
             rightMotorDirection = 1;
         }else{
@@ -212,8 +152,8 @@ public class craterAutonomous extends LinearOpMode {
 
         timer.reset();
         while(opModeIsActive() &&
-               timer.seconds() <= timeOut &&
-                currAngle != turnAngle){
+               timer.seconds() < timeOut &&
+                currAngle != targetAngle){
             robot.leftDrive.setPower(speed * leftMotorDirection);
             robot.rightDrive.setPower(speed * rightMotorDirection);
             telemetry.addData("Current degrees: ", currAngle);
