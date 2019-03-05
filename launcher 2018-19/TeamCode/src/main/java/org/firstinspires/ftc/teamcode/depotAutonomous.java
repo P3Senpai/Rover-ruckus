@@ -34,6 +34,9 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
+import org.firstinspires.ftc.robotcore.external.tfod.TFObjectDetector;
+
 /**
  * This file illustrates the concept of driving a path based on encoder counts.
  * It uses the common Pushbot hardware class to define the drive on the robot.
@@ -71,8 +74,17 @@ public class depotAutonomous extends LinearOpMode {
     private ElapsedTime runtime = new ElapsedTime();
     private ElapsedTime totalTime = new ElapsedTime();
 
+    /* Tflow init */
+    private static final String TFOD_MODEL_ASSET = "RoverRuckus.tflite";
+    private static final String LABEL_GOLD_MINERAL = "Gold Mineral";
+    private static final String LABEL_SILVER_MINERAL = "Silver Mineral";
+    public boolean tflowEnd = false;
+    private static final String VUFORIA_KEY = "AZ/j8A//////AAABmZVEHy+xt0eVo5uqcTzZEbGJdSOl5xOlgz4v20hkChwwV0GrVUYBFGrWW8SKT6faGhFlWII8kGudEgBKQcHd794jTIIh0stYo1ZFdQcVn+XIz6msHXjvxgY5pqA4gao+LQ+fTBQ+d/k4yS9fsSFvNCFnTfanXj2F5HmIQIkGPaHi+c17DVMaiZubYRkW7JvrkLifB6w1fOTbUJAf7T2r9OG57DHehPjX6vq9tDgYASI3WR7bC68KRK0hDu6TAkjahalpSGDXqzsqKwpCL8LuwoOGqq04/On3vpRj4J+Z5swctGGj4wzWiF9J0Ha4UGI9eYHFmMOrITcCjswCX2cMIWeytm2wmUKSefxRxQD5dFpH";
+    private VuforiaLocalizer vuforia;
+    private TFObjectDetector tfod;
     @Override
     public void runOpMode() {
+        /* Tflow init */
 
         TenserFlow tf = new TenserFlow(); /** My code */
         robot.initAutonomous(hardwareMap);
